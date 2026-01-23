@@ -1,0 +1,9 @@
+---
+name: development-design
+description: This is a new rule
+---
+
+# Overview
+
+Always follow SOLID principles.
+Follow strictly typed typescript.

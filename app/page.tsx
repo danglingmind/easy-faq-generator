@@ -1,5 +1,5 @@
-import { ComponentExample } from "@/components/component-example";
+import { EditorPage } from "@/components/editor-page";
 
 export default function Page() {
-return <ComponentExample />;
+  return <EditorPage />;
 }
