@@ -1,0 +1,10 @@
+---
+name: ui-system
+description: This is a new rule
+---
+
+# Overview
+
+Always prefer shadcn ui components.
+Always use the existing UX design system and global css for any UI development.
+Our style is modern and compact.
