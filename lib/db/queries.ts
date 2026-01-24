@@ -74,6 +74,7 @@ export async function createEmbed(
 
 /**
  * Create or update an embed based on user's paid status
+ * - If embedId is provided: Update that specific embed (for editing loaded embeds)
  * - Paid users: Reuse existing embed if config matches, otherwise create new
  * - Free users: Always create new embed
  * @returns Object with embed and reused flag
@@ -82,8 +83,23 @@ export async function createOrUpdateEmbed(
   userId: string,
   config: FAQConfig,
   rendered?: { html: string; css: string; schema: unknown },
-  isPaid: boolean = false
+  isPaid: boolean = false,
+  embedId?: string
 ): Promise<{ embed: Awaited<ReturnType<typeof createEmbed>>; reused: boolean }> {
+  // If embedId is provided, update that specific embed (for editing loaded embeds)
+  if (embedId) {
+    // Verify the embed belongs to the user
+    const existing = await getEmbedById(embedId);
+    if (existing && existing.userId === userId) {
+      const updated = await updateEmbed(embedId, config, rendered);
+      return { embed: updated, reused: true };
+    } else {
+      // Embed not found or doesn't belong to user, create new one
+      const newEmbed = await createEmbed(userId, config, rendered);
+      return { embed: newEmbed, reused: false };
+    }
+  }
+
   // For paid users, check if there's an existing embed with matching config
   if (isPaid) {
     const existing = await findEmbedByConfig(userId, config);

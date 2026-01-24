@@ -58,6 +58,7 @@ export function EditorPage() {
   const [embedCopied, setEmbedCopied] = useState(false);
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const [isPaid, setIsPaid] = useState(false);
+  const [currentEmbedId, setCurrentEmbedId] = useState<string | null>(null);
 
   const isSignedIn = !!user?.id;
 
@@ -211,7 +212,7 @@ export function EditorPage() {
     [content, selectedTemplate, styles]
   );
 
-  const handleLoadEmbed = useCallback((loadedConfig: FAQConfig) => {
+  const handleLoadEmbed = useCallback((loadedConfig: FAQConfig, embedId: string) => {
     // Update content
     setContent(loadedConfig.content);
     
@@ -220,6 +221,9 @@ export function EditorPage() {
     
     // Update styles
     setStyles(normalizeStyles(loadedConfig.styles));
+    
+    // Track the loaded embed ID
+    setCurrentEmbedId(embedId);
     
     // Save to localStorage
     saveEditorState({
@@ -258,19 +262,26 @@ export function EditorPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ config, rendered: renderedPayload }),
+        body: JSON.stringify({ 
+          config, 
+          rendered: renderedPayload,
+          embedId: currentEmbedId, // Pass the current embed ID if we're updating an existing one
+        }),
       });
 
       if (!response.ok) {
         throw new Error("Failed to save embed");
       }
 
-      const { embedId } = await response.json();
+      const { embedId, reused } = await response.json();
       const embedCode = `<div data-faq-embed="${embedId}"></div>\n<script src="${window.location.origin}/faq-embed.js" async></script>`;
+
+      // Update the current embed ID if we got a new one
+      setCurrentEmbedId(embedId);
 
       await navigator.clipboard.writeText(embedCode);
       setEmbedCopied(true);
-      toast.success("Embed code copied to clipboard!");
+      toast.success(reused ? "Embed updated and code copied!" : "Embed code copied to clipboard!");
 
       // Update user usage in database
       try {
@@ -299,7 +310,7 @@ export function EditorPage() {
       console.error("Failed to copy embed code:", error);
       toast.error("Failed to copy embed code. Please try again.");
     }
-  }, [embedCopied, embedCopyStorageKey, isPaid, isSignedIn, router, config]);
+  }, [embedCopied, embedCopyStorageKey, isPaid, isSignedIn, router, config, currentEmbedId]);
 
   if (!isLoaded) {
     return (

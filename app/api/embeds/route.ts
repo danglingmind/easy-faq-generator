@@ -58,12 +58,29 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const config: FAQConfig = body.config;
     const rendered = body.rendered;
+    const embedId: string | undefined = body.embedId;
 
     if (!config) {
       return NextResponse.json(
         { error: "Config is required" },
         { status: 400 }
       );
+    }
+
+    // If embedId is provided, update that specific embed (for loaded embeds being edited)
+    if (embedId) {
+      const { embed, reused } = await createOrUpdateEmbed(
+        userId,
+        config,
+        rendered,
+        true, // Assume paid if updating existing embed
+        embedId
+      );
+      return NextResponse.json({
+        embedId: embed.id,
+        success: true,
+        reused,
+      });
     }
 
     // Check if user is paid

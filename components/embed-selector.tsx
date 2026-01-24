@@ -38,7 +38,7 @@ interface EmbedPreview {
 }
 
 interface EmbedSelectorProps {
-  onSelectEmbed: (config: FAQConfig) => void;
+  onSelectEmbed: (config: FAQConfig, embedId: string) => void;
   isSignedIn: boolean;
 }
 
@@ -80,7 +80,7 @@ export function EmbedSelector({ onSelectEmbed, isSignedIn }: EmbedSelectorProps)
         throw new Error("Failed to load embed");
       }
       const data = await response.json();
-      onSelectEmbed(data.embed.config);
+      onSelectEmbed(data.embed.config, embedId);
       setOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load embed");
