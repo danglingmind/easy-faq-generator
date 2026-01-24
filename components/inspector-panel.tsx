@@ -19,6 +19,8 @@ import { TypographyControls } from "./typography-controls";
 import { ColorControls } from "./color-controls";
 import { AccordionControls } from "./accordion-controls";
 import { SpacingControls } from "./spacing-controls";
+import { EmbedSelector } from "./embed-selector";
+import { FAQConfig } from "@/lib/types";
 
 interface InspectorPanelProps {
   selectedTemplate: string;
@@ -29,6 +31,7 @@ interface InspectorPanelProps {
   isSignedIn: boolean;
   embedCopied: boolean;
   onCopyEmbed: () => void;
+  onLoadEmbed?: (config: FAQConfig) => void;
 }
 
 export function InspectorPanel({
@@ -40,12 +43,21 @@ export function InspectorPanel({
   isSignedIn,
   embedCopied,
   onCopyEmbed,
+  onLoadEmbed,
 }: InspectorPanelProps) {
   const router = useRouter();
 
   return (
     <div className="w-[340px] overflow-y-auto border-l bg-muted/30 p-4">
       <div className="space-y-6">
+        {isSignedIn && onLoadEmbed && (
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <Label>Saved Embeds</Label>
+            </div>
+            <EmbedSelector onSelectEmbed={onLoadEmbed} isSignedIn={isSignedIn} />
+          </div>
+        )}
         <div>
           <div className="mb-2 flex items-center justify-between">
             <Label>Template</Label>

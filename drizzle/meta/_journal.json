@@ -15,6 +15,13 @@
       "when": 1769259692496,
       "tag": "0001_sharp_trish_tilby",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1769281602675,
+      "tag": "0002_legal_sunspot",
+      "breakpoints": true
     }
   ]
 }

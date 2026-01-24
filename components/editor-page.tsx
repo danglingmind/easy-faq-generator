@@ -211,6 +211,26 @@ export function EditorPage() {
     [content, selectedTemplate, styles]
   );
 
+  const handleLoadEmbed = useCallback((loadedConfig: FAQConfig) => {
+    // Update content
+    setContent(loadedConfig.content);
+    
+    // Update template
+    setSelectedTemplate(loadedConfig.template);
+    
+    // Update styles
+    setStyles(normalizeStyles(loadedConfig.styles));
+    
+    // Save to localStorage
+    saveEditorState({
+      content: loadedConfig.content,
+      selectedTemplate: loadedConfig.template,
+      styles: loadedConfig.styles,
+    });
+    
+    toast.success("Embed configuration loaded!");
+  }, []);
+
   const handleCopyEmbed = useCallback(async () => {
     // Copy embed always requires login.
     if (!isSignedIn) {
@@ -316,6 +336,7 @@ export function EditorPage() {
           isSignedIn={isSignedIn}
           embedCopied={embedCopied}
           onCopyEmbed={handleCopyEmbed}
+          onLoadEmbed={handleLoadEmbed}
         />
       </div>
     </div>

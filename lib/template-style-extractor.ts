@@ -235,138 +235,108 @@ export async function extractTemplateStyles(templateId: string): Promise<FAQStyl
       return null;
     }
 
-    // Extract values from CSS - try template-specific selector first, then fallback
-    // Escape template ID for regex
+    // Extract values from CSS
+    // STANDARD: All templates should use generic selectors (e.g., .faq-container, .faq-heading)
+    // See TEMPLATE_FORMAT.md for the template format specification
+    // 
+    // We try generic selectors first (the standard), then fallback to template-specific selectors
+    // for backward compatibility with older templates
     const escapedTemplateId = templateId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    // Match both single and double quotes in attribute selector: [data-template="split"] or [data-template='split']
-    // Use character class [\"'] to match either quote type
+    // Template-specific selectors (fallback only - new templates should not use these)
     const templateSelector = `\\.faq-container\\[data-template=[\\"']${escapedTemplateId}[\\"']\\]`;
     const templateHeadingSelector = `${templateSelector}\\s+\\.faq-heading`;
     const templateDescriptionSelector = `${templateSelector}\\s+\\.faq-description`;
     const templateQuestionSelector = `${templateSelector}\\s+\\.faq-question`;
     const templateAnswerSelector = `${templateSelector}\\s+\\.faq-answer`;
+    const templateItemSelector = `${templateSelector}\\s+\\.faq-item`;
     
-    // For split template, CSS uses generic selectors without data-template attribute
-    // So we need to try generic selectors first for split template
-    const useGenericSelectorsFirst = templateId === "split";
+    // Always try generic selectors first (standard format), then fallback to template-specific (legacy)
+    // Extract background color
+    let backgroundColor = extractBackgroundColor(css, "\\.faq-container") 
+      || extractBackgroundColor(css, templateSelector)
+      || defaultStyles.backgroundColor;
     
-    // Extract background color - try template-specific selector first
-    let backgroundColor = extractBackgroundColor(css, templateSelector);
-    if (!backgroundColor) {
-      // Fallback to generic container selector
-      backgroundColor = extractBackgroundColor(css, "\\.faq-container");
-    }
-    // If still not found, use default
-    if (!backgroundColor) {
-      backgroundColor = defaultStyles.backgroundColor;
-    }
-    const headingColor = extractColor(css, templateHeadingSelector) 
-      || extractColor(css, "\\.faq-heading") 
+    // Extract colors - try generic first, then template-specific
+    const headingColor = extractColor(css, "\\.faq-heading") 
+      || extractColor(css, templateHeadingSelector) 
       || defaultStyles.heading.color;
-    const descriptionColor = extractColor(css, templateDescriptionSelector)
-      || extractColor(css, "\\.faq-description")
+    const descriptionColor = extractColor(css, "\\.faq-description")
+      || extractColor(css, templateDescriptionSelector)
       || defaultStyles.description.color;
-    const questionColor = extractColor(css, templateQuestionSelector)
-      || extractColor(css, "\\.faq-question")
+    const questionColor = extractColor(css, "\\.faq-question")
+      || extractColor(css, templateQuestionSelector)
       || defaultStyles.question.color;
-    // Extract answer color - try template-specific selector first
-    let answerColor = extractColor(css, templateAnswerSelector);
-    if (!answerColor) {
-      // Fallback to generic answer selector
-      answerColor = extractColor(css, "\\.faq-answer");
-    }
-    // If still not found, use default
-    if (!answerColor) {
-      answerColor = defaultStyles.answer.color;
-    }
+    const answerColor = extractColor(css, "\\.faq-answer")
+      || extractColor(css, templateAnswerSelector)
+      || defaultStyles.answer.color;
 
-    // For split template, try generic selectors first since CSS doesn't use data-template attribute
-    const headingFontSize = useGenericSelectorsFirst
-      ? (extractFontSize(css, "\\.faq-heading") || extractFontSize(css, templateHeadingSelector))
-      : (extractFontSize(css, templateHeadingSelector) || extractFontSize(css, "\\.faq-heading"));
-    const descriptionFontSize = useGenericSelectorsFirst
-      ? (extractFontSize(css, "\\.faq-description") || extractFontSize(css, templateDescriptionSelector))
-      : (extractFontSize(css, templateDescriptionSelector) || extractFontSize(css, "\\.faq-description"));
-    const questionFontSize = useGenericSelectorsFirst
-      ? (extractFontSize(css, "\\.faq-question") || extractFontSize(css, templateQuestionSelector))
-      : (extractFontSize(css, templateQuestionSelector) || extractFontSize(css, "\\.faq-question"));
-    const answerFontSize = useGenericSelectorsFirst
-      ? (extractFontSize(css, "\\.faq-answer") || extractFontSize(css, templateAnswerSelector))
-      : (extractFontSize(css, templateAnswerSelector) || extractFontSize(css, "\\.faq-answer"));
+    // Extract font sizes - try generic first, then template-specific
+    const headingFontSize = extractFontSize(css, "\\.faq-heading") 
+      || extractFontSize(css, templateHeadingSelector)
+      || defaultStyles.heading.fontSize;
+    const descriptionFontSize = extractFontSize(css, "\\.faq-description")
+      || extractFontSize(css, templateDescriptionSelector)
+      || defaultStyles.description.fontSize;
+    const questionFontSize = extractFontSize(css, "\\.faq-question")
+      || extractFontSize(css, templateQuestionSelector)
+      || defaultStyles.question.fontSize;
+    const answerFontSize = extractFontSize(css, "\\.faq-answer")
+      || extractFontSize(css, templateAnswerSelector)
+      || defaultStyles.answer.fontSize;
 
-    const headingFontWeight = useGenericSelectorsFirst
-      ? (extractFontWeight(css, "\\.faq-heading") || extractFontWeight(css, templateHeadingSelector))
-      : (extractFontWeight(css, templateHeadingSelector) || extractFontWeight(css, "\\.faq-heading"));
-    const descriptionFontWeight = useGenericSelectorsFirst
-      ? (extractFontWeight(css, "\\.faq-description") || extractFontWeight(css, templateDescriptionSelector))
-      : (extractFontWeight(css, templateDescriptionSelector) || extractFontWeight(css, "\\.faq-description"));
-    const questionFontWeight = useGenericSelectorsFirst
-      ? (extractFontWeight(css, "\\.faq-question") || extractFontWeight(css, templateQuestionSelector))
-      : (extractFontWeight(css, templateQuestionSelector) || extractFontWeight(css, "\\.faq-question"));
-    const answerFontWeight = useGenericSelectorsFirst
-      ? (extractFontWeight(css, "\\.faq-answer") || extractFontWeight(css, templateAnswerSelector))
-      : (extractFontWeight(css, templateAnswerSelector) || extractFontWeight(css, "\\.faq-answer"));
+    // Extract font weights - try generic first, then template-specific
+    const headingFontWeight = extractFontWeight(css, "\\.faq-heading")
+      || extractFontWeight(css, templateHeadingSelector)
+      || defaultStyles.heading.fontWeight;
+    const descriptionFontWeight = extractFontWeight(css, "\\.faq-description")
+      || extractFontWeight(css, templateDescriptionSelector)
+      || defaultStyles.description.fontWeight;
+    const questionFontWeight = extractFontWeight(css, "\\.faq-question")
+      || extractFontWeight(css, templateQuestionSelector)
+      || defaultStyles.question.fontWeight;
+    const answerFontWeight = extractFontWeight(css, "\\.faq-answer")
+      || extractFontWeight(css, templateAnswerSelector)
+      || defaultStyles.answer.fontWeight;
 
     // Extract container font family for fallback
-    const containerFontFamily =
-      extractFontFamilyValue(css, templateSelector) ||
-      extractFontFamilyValue(css, "\\.faq-container") ||
-      null;
+    const containerFontFamily = extractFontFamilyValue(css, "\\.faq-container")
+      || extractFontFamilyValue(css, templateSelector)
+      || null;
     
-    // For split template, try generic selectors first
-    const headingFontFamily = useGenericSelectorsFirst
-      ? (extractFontFamilyValue(css, "\\.faq-heading") ||
-         extractFontFamilyValue(css, templateHeadingSelector) ||
-         containerFontFamily ||
-         defaultStyles.heading.fontFamily)
-      : (extractFontFamilyValue(css, templateHeadingSelector) ||
-         extractFontFamilyValue(css, "\\.faq-heading") ||
-         containerFontFamily ||
-         defaultStyles.heading.fontFamily);
-    const descriptionFontFamily = useGenericSelectorsFirst
-      ? (extractFontFamilyValue(css, "\\.faq-description") ||
-         extractFontFamilyValue(css, templateDescriptionSelector) ||
-         containerFontFamily ||
-         defaultStyles.description.fontFamily)
-      : (extractFontFamilyValue(css, templateDescriptionSelector) ||
-         extractFontFamilyValue(css, "\\.faq-description") ||
-         containerFontFamily ||
-         defaultStyles.description.fontFamily);
-    const questionFontFamily = useGenericSelectorsFirst
-      ? (extractFontFamilyValue(css, "\\.faq-question") ||
-         extractFontFamilyValue(css, templateQuestionSelector) ||
-         containerFontFamily ||
-         defaultStyles.question.fontFamily)
-      : (extractFontFamilyValue(css, templateQuestionSelector) ||
-         extractFontFamilyValue(css, "\\.faq-question") ||
-         containerFontFamily ||
-         defaultStyles.question.fontFamily);
-    const answerFontFamily = useGenericSelectorsFirst
-      ? (extractFontFamilyValue(css, "\\.faq-answer") ||
-         extractFontFamilyValue(css, templateAnswerSelector) ||
-         containerFontFamily ||
-         defaultStyles.answer.fontFamily)
-      : (extractFontFamilyValue(css, templateAnswerSelector) ||
-         extractFontFamilyValue(css, "\\.faq-answer") ||
-         containerFontFamily ||
-         defaultStyles.answer.fontFamily);
+    // Extract font families - try generic first, then template-specific, then container, then default
+    const headingFontFamily = extractFontFamilyValue(css, "\\.faq-heading")
+      || extractFontFamilyValue(css, templateHeadingSelector)
+      || containerFontFamily
+      || defaultStyles.heading.fontFamily;
+    const descriptionFontFamily = extractFontFamilyValue(css, "\\.faq-description")
+      || extractFontFamilyValue(css, templateDescriptionSelector)
+      || containerFontFamily
+      || defaultStyles.description.fontFamily;
+    const questionFontFamily = extractFontFamilyValue(css, "\\.faq-question")
+      || extractFontFamilyValue(css, templateQuestionSelector)
+      || containerFontFamily
+      || defaultStyles.question.fontFamily;
+    const answerFontFamily = extractFontFamilyValue(css, "\\.faq-answer")
+      || extractFontFamilyValue(css, templateAnswerSelector)
+      || containerFontFamily
+      || defaultStyles.answer.fontFamily;
 
+    // Extract spacing and padding - try generic first, then template-specific
     const spacing = extractSpacing(css);
-    const questionPadding = extractPadding(css, templateQuestionSelector)
-      || extractPadding(css, "\\.faq-question");
+    const questionPadding = extractPadding(css, "\\.faq-question")
+      || extractPadding(css, templateQuestionSelector);
 
-    // Extract border properties from template CSS
-    const templateItemSelector = `${templateSelector}\\s+\\.faq-item`;
-    const borderTop = extractCSSValue(css, templateItemSelector, "border-top") 
-      || extractCSSValue(css, "\\.faq-item", "border-top");
-    const borderRight = extractCSSValue(css, templateItemSelector, "border-right")
-      || extractCSSValue(css, "\\.faq-item", "border-right");
-    const borderBottom = extractCSSValue(css, templateItemSelector, "border-bottom")
-      || extractCSSValue(css, "\\.faq-item", "border-bottom");
-    const borderLeft = extractCSSValue(css, templateItemSelector, "border-left")
-      || extractCSSValue(css, "\\.faq-item", "border-left");
-    const border = extractCSSValue(css, templateItemSelector, "border")
-      || extractCSSValue(css, "\\.faq-item", "border");
+    // Extract border properties - try generic first, then template-specific
+    const borderTop = extractCSSValue(css, "\\.faq-item", "border-top")
+      || extractCSSValue(css, templateItemSelector, "border-top");
+    const borderRight = extractCSSValue(css, "\\.faq-item", "border-right")
+      || extractCSSValue(css, templateItemSelector, "border-right");
+    const borderBottom = extractCSSValue(css, "\\.faq-item", "border-bottom")
+      || extractCSSValue(css, templateItemSelector, "border-bottom");
+    const borderLeft = extractCSSValue(css, "\\.faq-item", "border-left")
+      || extractCSSValue(css, templateItemSelector, "border-left");
+    const border = extractCSSValue(css, "\\.faq-item", "border")
+      || extractCSSValue(css, templateItemSelector, "border");
     
     // Determine if border is visible and extract border properties
     const hasBorder = !!(borderTop || borderRight || borderBottom || borderLeft || (border && border !== "none"));

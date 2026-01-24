@@ -86,8 +86,8 @@ export function buildCombinedCSS(
 ): string {
   // Generate dynamic CSS from styles object and merge with template CSS
   // Dynamic CSS comes AFTER template CSS so user customizations override template defaults
-  // Pass templateId to skip certain overrides for template-specific styles
-  const dynamicCSS = generateDynamicCSS(styles, templateId);
+  // Pass template CSS to detect if template should be protected from overrides
+  const dynamicCSS = generateDynamicCSS(styles, templateId, template.css);
   return `/* Template Base Styles */\n${template.css}\n\n/* User Customizations */\n${dynamicCSS}`;
 }
 

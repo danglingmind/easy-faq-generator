@@ -1,0 +1,1 @@
+CREATE INDEX "embeds_user_id_idx" ON "embeds" USING btree ("user_id");

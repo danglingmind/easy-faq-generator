@@ -1,4 +1,4 @@
-import { pgTable, timestamp, boolean, jsonb, varchar, serial, integer } from "drizzle-orm/pg-core";
+import { pgTable, timestamp, boolean, jsonb, varchar, serial, integer, index } from "drizzle-orm/pg-core";
 import { createId } from "@paralleldrive/cuid2";
 
 export const embeds = pgTable("embeds", {
@@ -24,7 +24,9 @@ export const embeds = pgTable("embeds", {
   }>(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  userIdIdx: index("embeds_user_id_idx").on(table.userId),
+}));
 
 export const userUsage = pgTable("user_usage", {
   id: serial("id").primaryKey(),

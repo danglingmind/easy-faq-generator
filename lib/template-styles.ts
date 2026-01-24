@@ -42,12 +42,34 @@ const fontWeightMap: Record<string, string> = {
 };
 
 /**
+ * Detect if a template should be protected from user customizations
+ * A template is considered "protected" if it uses !important in its CSS,
+ * indicating it has strong styling preferences that shouldn't be overridden
+ * 
+ * See TEMPLATE_FORMAT.md for template format specification
+ */
+function isTemplateProtected(templateCSS?: string): boolean {
+  if (!templateCSS) return false;
+  // Check if template CSS uses !important (indicating it wants to control styling)
+  // We look for a reasonable threshold - if more than 3 properties use !important,
+  // the template likely wants full control
+  // This follows the standard defined in TEMPLATE_FORMAT.md
+  const importantMatches = templateCSS.match(/!important/gi);
+  return importantMatches ? importantMatches.length > 3 : false;
+}
+
+/**
  * Generate dynamic CSS from styles object
  * This applies user customizations to the template
+ * 
+ * Templates using !important (see TEMPLATE_FORMAT.md) are automatically protected
+ * from user customizations to preserve their visual identity.
+ * 
  * @param styles - The styles object
- * @param templateId - Optional template ID to skip certain overrides for template-specific styles
+ * @param templateId - Optional template ID for higher specificity selectors
+ * @param templateCSS - Optional template CSS to detect if template should be protected
  */
-export function generateDynamicCSS(styles: FAQStyles, templateId?: string): string {
+export function generateDynamicCSS(styles: FAQStyles, templateId?: string, templateCSS?: string): string {
   const {
     heading,
     description,
@@ -75,9 +97,8 @@ export function generateDynamicCSS(styles: FAQStyles, templateId?: string): stri
           .join("&")}&display=swap");\n`
       : "";
   
-  // Templates that have their own styles that shouldn't be overridden
-  const templateControlledStyles = ['split'];
-  const isTemplateControlled = templateId && templateControlledStyles.includes(templateId);
+  // Automatically detect if template should be protected based on its CSS
+  const isTemplateControlled = isTemplateProtected(templateCSS);
 
   // Defensive check for borderSides - ensure it exists and has all properties
   const borderSides = accordion.borderSides || {
