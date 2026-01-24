@@ -87,12 +87,14 @@ function extractFontSize(css: string, selector: string): FAQStyles["heading"]["f
   const sizeMap: Record<string, FAQStyles["heading"]["fontSize"]> = {
     "0.75rem": "XS",
     "0.875rem": "SM",
+    "0.95rem": "SM",
     "1rem": "MD",
     "1.125rem": "LG",
     "1.25rem": "XL",
     "1.5rem": "2XL",
     "1.875rem": "3XL",
     "2.25rem": "4XL",
+    "2.75rem": "4XL",
     "3.5rem": "3XL", // Split template uses 3.5rem
   };
 
@@ -123,6 +125,27 @@ function extractFontSize(css: string, selector: string): FAQStyles["heading"]["f
   }
 
   return defaultStyles.heading.fontSize;
+}
+
+/**
+ * Extract font family and convert to FAQStyles fontFamily enum
+ */
+function extractFontFamilyValue(css: string, selector: string): FAQStyles["heading"]["fontFamily"] | null {
+  const value = extractCSSValue(css, selector, "font-family");
+  if (!value) return null;
+
+  const normalized = value.toLowerCase();
+  if (normalized.includes("inter")) return "Inter";
+  if (normalized.includes("roboto")) return "Roboto";
+  if (normalized.includes("open sans")) return "Open Sans";
+  if (normalized.includes("lato")) return "Lato";
+  if (normalized.includes("montserrat")) return "Montserrat";
+  if (normalized.includes("poppins")) return "Poppins";
+  if (normalized.includes("serif") || normalized.includes("georgia")) return "Serif";
+  if (normalized.includes("mono")) return "Mono";
+  if (normalized.includes("sans")) return "Sans";
+
+  return null;
 }
 
 /**
@@ -259,6 +282,31 @@ export async function extractTemplateStyles(templateId: string): Promise<FAQStyl
     const answerFontWeight = extractFontWeight(css, templateAnswerSelector)
       || extractFontWeight(css, "\\.faq-answer");
 
+    const containerFontFamily =
+      extractFontFamilyValue(css, templateSelector) ||
+      extractFontFamilyValue(css, "\\.faq-container") ||
+      null;
+    const headingFontFamily =
+      extractFontFamilyValue(css, templateHeadingSelector) ||
+      extractFontFamilyValue(css, "\\.faq-heading") ||
+      containerFontFamily ||
+      defaultStyles.heading.fontFamily;
+    const descriptionFontFamily =
+      extractFontFamilyValue(css, templateDescriptionSelector) ||
+      extractFontFamilyValue(css, "\\.faq-description") ||
+      containerFontFamily ||
+      defaultStyles.description.fontFamily;
+    const questionFontFamily =
+      extractFontFamilyValue(css, templateQuestionSelector) ||
+      extractFontFamilyValue(css, "\\.faq-question") ||
+      containerFontFamily ||
+      defaultStyles.question.fontFamily;
+    const answerFontFamily =
+      extractFontFamilyValue(css, templateAnswerSelector) ||
+      extractFontFamilyValue(css, "\\.faq-answer") ||
+      containerFontFamily ||
+      defaultStyles.answer.fontFamily;
+
     const spacing = extractSpacing(css);
     const questionPadding = extractPadding(css, templateQuestionSelector)
       || extractPadding(css, "\\.faq-question");
@@ -286,12 +334,14 @@ export async function extractTemplateStyles(templateId: string): Promise<FAQStyl
     
     if (borderTop || border) {
       const borderValue = borderTop || border;
-      // Parse border value: "1px solid #e5e5e5" or similar
-      const borderMatch = borderValue.match(/(\d+)px\s+(\w+)\s+(.+)/);
-      if (borderMatch) {
-        borderWidth = parseInt(borderMatch[1]) || borderWidth;
-        borderStyle = (borderMatch[2] as any) || borderStyle;
-        borderColor = borderMatch[3].trim().replace(/['"]/g, "") || borderColor;
+      if (borderValue) {
+        // Parse border value: "1px solid #e5e5e5" or similar
+        const borderMatch = borderValue.match(/(\d+)px\s+(\w+)\s+(.+)/);
+        if (borderMatch) {
+          borderWidth = parseInt(borderMatch[1]) || borderWidth;
+          borderStyle = (borderMatch[2] as any) || borderStyle;
+          borderColor = borderMatch[3].trim().replace(/['"]/g, "") || borderColor;
+        }
       }
     }
     
@@ -318,24 +368,28 @@ export async function extractTemplateStyles(templateId: string): Promise<FAQStyl
       heading: {
         ...defaultStyles.heading,
         color: headingColor,
+        fontFamily: headingFontFamily,
         fontSize: headingFontSize,
         fontWeight: headingFontWeight,
       },
       description: {
         ...defaultStyles.description,
         color: descriptionColor,
+        fontFamily: descriptionFontFamily,
         fontSize: descriptionFontSize,
         fontWeight: descriptionFontWeight,
       },
       question: {
         ...defaultStyles.question,
         color: questionColor,
+        fontFamily: questionFontFamily,
         fontSize: questionFontSize,
         fontWeight: questionFontWeight,
       },
       answer: {
         ...defaultStyles.answer,
         color: answerColor,
+        fontFamily: answerFontFamily,
         fontSize: answerFontSize,
         fontWeight: answerFontWeight,
       },

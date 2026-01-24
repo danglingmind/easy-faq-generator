@@ -101,15 +101,15 @@ export function generateDynamicCSS(styles: FAQStyles, templateId?: string): stri
       font-family: ${fontFamilyMap[heading.fontFamily] || fontFamilyMap.Default} !important;
     }
     .faq-heading {
-      font-family: ${fontFamilyMap[heading.fontFamily] || fontFamilyMap.Default} !important;
-      font-size: ${fontSizeMap[heading.fontSize]} !important;
-      font-weight: ${fontWeightMap[heading.fontWeight]} !important;
+      ${!isTemplateControlled ? `font-family: ${fontFamilyMap[heading.fontFamily] || fontFamilyMap.Default} !important;` : ''}
+      ${!isTemplateControlled ? `font-size: ${fontSizeMap[heading.fontSize]} !important;` : ''}
+      ${!isTemplateControlled ? `font-weight: ${fontWeightMap[heading.fontWeight]} !important;` : ''}
       ${!isTemplateControlled ? `color: ${heading.color} !important;` : ''}
     }
     .faq-description {
-      font-family: ${fontFamilyMap[description.fontFamily] || fontFamilyMap.Default} !important;
-      font-size: ${fontSizeMap[description.fontSize]} !important;
-      font-weight: ${fontWeightMap[description.fontWeight]} !important;
+      ${!isTemplateControlled ? `font-family: ${fontFamilyMap[description.fontFamily] || fontFamilyMap.Default} !important;` : ''}
+      ${!isTemplateControlled ? `font-size: ${fontSizeMap[description.fontSize]} !important;` : ''}
+      ${!isTemplateControlled ? `font-weight: ${fontWeightMap[description.fontWeight]} !important;` : ''}
       ${!isTemplateControlled ? `color: ${description.color} !important;` : ''}
     }
     /* Use higher specificity selector for templates that use data-template attribute */
@@ -150,20 +150,20 @@ export function generateDynamicCSS(styles: FAQStyles, templateId?: string): stri
     }
     /* Use higher specificity selector for templates that use data-template attribute */
     ${templateId ? `.faq-container[data-template="${templateId}"] .faq-question` : '.faq-question'} {
-      font-family: ${fontFamilyMap[question.fontFamily] || fontFamilyMap.Default} !important;
-      font-size: ${fontSizeMap[question.fontSize]} !important;
-      font-weight: ${fontWeightMap[question.fontWeight]} !important;
+      ${!isTemplateControlled ? `font-family: ${fontFamilyMap[question.fontFamily] || fontFamilyMap.Default} !important;` : ''}
+      ${!isTemplateControlled ? `font-size: ${fontSizeMap[question.fontSize]} !important;` : ''}
+      ${!isTemplateControlled ? `font-weight: ${fontWeightMap[question.fontWeight]} !important;` : ''}
       ${!isTemplateControlled ? `color: ${question.color} !important;` : ''}
-      padding: ${accordion.paddingY}px ${accordion.paddingX}px !important;
-      margin: ${accordion.marginY}px ${accordion.marginX}px !important;
+      ${!isTemplateControlled ? `padding: ${accordion.paddingY}px ${accordion.paddingX}px !important;` : ''}
+      ${!isTemplateControlled ? `margin: ${accordion.marginY}px ${accordion.marginX}px !important;` : ''}
     }
     ${templateId ? `.faq-container[data-template="${templateId}"] .faq-answer` : '.faq-answer'} {
-      font-family: ${fontFamilyMap[answer.fontFamily] || fontFamilyMap.Default} !important;
-      font-size: ${fontSizeMap[answer.fontSize]} !important;
-      font-weight: ${fontWeightMap[answer.fontWeight]} !important;
+      ${!isTemplateControlled ? `font-family: ${fontFamilyMap[answer.fontFamily] || fontFamilyMap.Default} !important;` : ''}
+      ${!isTemplateControlled ? `font-size: ${fontSizeMap[answer.fontSize]} !important;` : ''}
+      ${!isTemplateControlled ? `font-weight: ${fontWeightMap[answer.fontWeight]} !important;` : ''}
       ${!isTemplateControlled ? `color: ${answer.color} !important;` : ''}
-      padding: 0 ${accordion.paddingX}px ${accordion.paddingY}px !important;
-      margin: 0 ${accordion.marginX}px ${accordion.marginY}px !important;
+      ${!isTemplateControlled ? `padding: 0 ${accordion.paddingX}px ${accordion.paddingY}px !important;` : ''}
+      ${!isTemplateControlled ? `margin: 0 ${accordion.marginX}px ${accordion.marginY}px !important;` : ''}
       ${accordion.animationType === "Fade" ? `transition: opacity ${accordion.animationDuration}ms !important;` : ""}
       ${accordion.animationType === "Slide" ? `transition: max-height ${accordion.animationDuration}ms !important;` : ""}
     }
