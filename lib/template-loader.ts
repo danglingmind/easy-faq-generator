@@ -24,14 +24,13 @@ export function injectContent(
 ): string {
   let html = template.html;
   
-  // Add template ID as data attribute to container for CSS specificity
-  if (templateId) {
-    // Match various formats: class="faq-container", class='faq-container', class=faq-container
-    html = html.replace(
-      /class=["']?faq-container["']?/g,
-      `class="faq-container" data-template="${templateId}"`
-    );
-  }
+  // Add template and accordion metadata to container
+  const animationAttrs = `data-animation-type="${styles.accordion.animationType}" data-animation-duration="${styles.accordion.animationDuration}" data-accordion-mode="single"`;
+  const templateAttr = templateId ? ` data-template="${templateId}"` : "";
+  html = html.replace(
+    /class=["']?faq-container["']?/g,
+    `class="faq-container"${templateAttr} ${animationAttrs}`
+  );
 
   // Inject heading
   html = html.replace(new RegExp(PLACEHOLDERS.HEADING, "g"), escapeHtml(content.heading));
@@ -104,11 +103,22 @@ function generateItemsHTML(
     .map(
       (item, index) => `
     <div class="faq-item" data-open="false">
-      <button class="faq-question" onclick="toggleFAQ(this)" aria-expanded="false">
+      <button
+        class="faq-question"
+        data-accordion-button
+        aria-expanded="false"
+        aria-controls="faq-answer-${index}"
+        id="faq-question-${index}"
+      >
         <span>${escapeHtml(item.question || `Question ${index + 1}`)}</span>
         <span class="faq-icon">${iconSvg}</span>
       </button>
-      <div class="faq-answer" id="answer-${index}">
+      <div
+        class="faq-answer"
+        id="faq-answer-${index}"
+        role="region"
+        aria-labelledby="faq-question-${index}"
+      >
         ${escapeHtml(item.answer || `Answer ${index + 1}`)}
       </div>
     </div>

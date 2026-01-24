@@ -7,10 +7,21 @@
     );
   }
 
-  async function loadEmbedPayload(embedId) {
+  function resolveEmbedOrigin(node) {
+    const explicitOrigin = node.getAttribute("data-faq-origin");
+    if (explicitOrigin) {
+      return explicitOrigin.replace(/\/$/, "");
+    }
+    if (window.location.protocol === "file:" || window.location.origin === "null") {
+      return "http://localhost:3000";
+    }
+    return window.location.origin;
+  }
+
+  async function loadEmbedPayload(embedId, origin) {
     try {
       const response = await fetch(
-        `${window.location.origin}/api/public/embed/${embedId}`
+        `${origin}/api/public/embed/${embedId}`
       );
       if (!response.ok) {
         throw new Error(`Failed to load embed: ${response.status}`);
@@ -40,6 +51,20 @@
     // Inject HTML
     node.innerHTML = payload.html;
 
+    // Execute inline scripts inside the embedded HTML (e.g., toggleFAQ)
+    const inlineScripts = Array.from(node.querySelectorAll("script"));
+    inlineScripts.forEach((oldScript) => {
+      const script = document.createElement("script");
+      if (oldScript.src) {
+        script.src = oldScript.src;
+        script.async = oldScript.async;
+      } else {
+        script.textContent = oldScript.textContent || "";
+      }
+      document.body.appendChild(script);
+      oldScript.remove();
+    });
+
     // Inject JSON-LD schema
     if (payload.schema) {
       const scriptId = `faq-embed-schema-${node.getAttribute("data-faq-embed")}`;
@@ -66,7 +91,8 @@
       const embedId = node.getAttribute("data-faq-embed");
       if (!embedId) continue;
 
-      const payload = await loadEmbedPayload(embedId);
+      const origin = resolveEmbedOrigin(node);
+      const payload = await loadEmbedPayload(embedId, origin);
       if (verifyIntegrity(payload)) {
         injectEmbed(node, payload);
       } else {
