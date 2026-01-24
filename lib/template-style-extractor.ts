@@ -87,15 +87,16 @@ function extractFontSize(css: string, selector: string): FAQStyles["heading"]["f
   const sizeMap: Record<string, FAQStyles["heading"]["fontSize"]> = {
     "0.75rem": "XS",
     "0.875rem": "SM",
-    "0.95rem": "SM",
+    "0.9rem": "SM",   // Split answer uses 0.9rem
+    "0.95rem": "SM",   // Split description uses 0.95rem
     "1rem": "MD",
     "1.125rem": "LG",
     "1.25rem": "XL",
     "1.5rem": "2XL",
     "1.875rem": "3XL",
     "2.25rem": "4XL",
-    "2.75rem": "4XL",
-    "3.5rem": "3XL", // Split template uses 3.5rem
+    "2.75rem": "4XL",  // Split heading uses 2.75rem
+    "3.5rem": "4XL",   // Split template uses 3.5rem
   };
 
   // Try exact match first
@@ -107,17 +108,28 @@ function extractFontSize(css: string, selector: string): FAQStyles["heading"]["f
   const remMatch = value.match(/([\d.]+)rem/);
   if (remMatch) {
     const remValue = parseFloat(remMatch[1]);
-    // Find closest match
+    // Find closest match - expanded map for better matching
     const remMap: Record<number, FAQStyles["heading"]["fontSize"]> = {
       0.75: "XS",
       0.875: "SM",
+      0.9: "SM",   // Split answer uses 0.9rem
+      0.95: "SM",   // Split description uses 0.95rem
       1: "MD",
       1.125: "LG",
       1.25: "XL",
       1.5: "2XL",
       1.875: "3XL",
       2.25: "4XL",
+      2.75: "4XL", // Split heading uses 2.75rem
+      3.5: "4XL",   // Split template uses 3.5rem
     };
+    
+    // First try exact match
+    if (remMap[remValue]) {
+      return remMap[remValue];
+    }
+    
+    // Then find closest match
     const closest = Object.keys(remMap)
       .map(Number)
       .reduce((prev, curr) => (Math.abs(curr - remValue) < Math.abs(prev - remValue) ? curr : prev));
@@ -234,6 +246,10 @@ export async function extractTemplateStyles(templateId: string): Promise<FAQStyl
     const templateQuestionSelector = `${templateSelector}\\s+\\.faq-question`;
     const templateAnswerSelector = `${templateSelector}\\s+\\.faq-answer`;
     
+    // For split template, CSS uses generic selectors without data-template attribute
+    // So we need to try generic selectors first for split template
+    const useGenericSelectorsFirst = templateId === "split";
+    
     // Extract background color - try template-specific selector first
     let backgroundColor = extractBackgroundColor(css, templateSelector);
     if (!backgroundColor) {
@@ -264,48 +280,76 @@ export async function extractTemplateStyles(templateId: string): Promise<FAQStyl
       answerColor = defaultStyles.answer.color;
     }
 
-    const headingFontSize = extractFontSize(css, templateHeadingSelector)
-      || extractFontSize(css, "\\.faq-heading");
-    const descriptionFontSize = extractFontSize(css, templateDescriptionSelector)
-      || extractFontSize(css, "\\.faq-description");
-    const questionFontSize = extractFontSize(css, templateQuestionSelector)
-      || extractFontSize(css, "\\.faq-question");
-    const answerFontSize = extractFontSize(css, templateAnswerSelector)
-      || extractFontSize(css, "\\.faq-answer");
+    // For split template, try generic selectors first since CSS doesn't use data-template attribute
+    const headingFontSize = useGenericSelectorsFirst
+      ? (extractFontSize(css, "\\.faq-heading") || extractFontSize(css, templateHeadingSelector))
+      : (extractFontSize(css, templateHeadingSelector) || extractFontSize(css, "\\.faq-heading"));
+    const descriptionFontSize = useGenericSelectorsFirst
+      ? (extractFontSize(css, "\\.faq-description") || extractFontSize(css, templateDescriptionSelector))
+      : (extractFontSize(css, templateDescriptionSelector) || extractFontSize(css, "\\.faq-description"));
+    const questionFontSize = useGenericSelectorsFirst
+      ? (extractFontSize(css, "\\.faq-question") || extractFontSize(css, templateQuestionSelector))
+      : (extractFontSize(css, templateQuestionSelector) || extractFontSize(css, "\\.faq-question"));
+    const answerFontSize = useGenericSelectorsFirst
+      ? (extractFontSize(css, "\\.faq-answer") || extractFontSize(css, templateAnswerSelector))
+      : (extractFontSize(css, templateAnswerSelector) || extractFontSize(css, "\\.faq-answer"));
 
-    const headingFontWeight = extractFontWeight(css, templateHeadingSelector)
-      || extractFontWeight(css, "\\.faq-heading");
-    const descriptionFontWeight = extractFontWeight(css, templateDescriptionSelector)
-      || extractFontWeight(css, "\\.faq-description");
-    const questionFontWeight = extractFontWeight(css, templateQuestionSelector)
-      || extractFontWeight(css, "\\.faq-question");
-    const answerFontWeight = extractFontWeight(css, templateAnswerSelector)
-      || extractFontWeight(css, "\\.faq-answer");
+    const headingFontWeight = useGenericSelectorsFirst
+      ? (extractFontWeight(css, "\\.faq-heading") || extractFontWeight(css, templateHeadingSelector))
+      : (extractFontWeight(css, templateHeadingSelector) || extractFontWeight(css, "\\.faq-heading"));
+    const descriptionFontWeight = useGenericSelectorsFirst
+      ? (extractFontWeight(css, "\\.faq-description") || extractFontWeight(css, templateDescriptionSelector))
+      : (extractFontWeight(css, templateDescriptionSelector) || extractFontWeight(css, "\\.faq-description"));
+    const questionFontWeight = useGenericSelectorsFirst
+      ? (extractFontWeight(css, "\\.faq-question") || extractFontWeight(css, templateQuestionSelector))
+      : (extractFontWeight(css, templateQuestionSelector) || extractFontWeight(css, "\\.faq-question"));
+    const answerFontWeight = useGenericSelectorsFirst
+      ? (extractFontWeight(css, "\\.faq-answer") || extractFontWeight(css, templateAnswerSelector))
+      : (extractFontWeight(css, templateAnswerSelector) || extractFontWeight(css, "\\.faq-answer"));
 
+    // Extract container font family for fallback
     const containerFontFamily =
       extractFontFamilyValue(css, templateSelector) ||
       extractFontFamilyValue(css, "\\.faq-container") ||
       null;
-    const headingFontFamily =
-      extractFontFamilyValue(css, templateHeadingSelector) ||
-      extractFontFamilyValue(css, "\\.faq-heading") ||
-      containerFontFamily ||
-      defaultStyles.heading.fontFamily;
-    const descriptionFontFamily =
-      extractFontFamilyValue(css, templateDescriptionSelector) ||
-      extractFontFamilyValue(css, "\\.faq-description") ||
-      containerFontFamily ||
-      defaultStyles.description.fontFamily;
-    const questionFontFamily =
-      extractFontFamilyValue(css, templateQuestionSelector) ||
-      extractFontFamilyValue(css, "\\.faq-question") ||
-      containerFontFamily ||
-      defaultStyles.question.fontFamily;
-    const answerFontFamily =
-      extractFontFamilyValue(css, templateAnswerSelector) ||
-      extractFontFamilyValue(css, "\\.faq-answer") ||
-      containerFontFamily ||
-      defaultStyles.answer.fontFamily;
+    
+    // For split template, try generic selectors first
+    const headingFontFamily = useGenericSelectorsFirst
+      ? (extractFontFamilyValue(css, "\\.faq-heading") ||
+         extractFontFamilyValue(css, templateHeadingSelector) ||
+         containerFontFamily ||
+         defaultStyles.heading.fontFamily)
+      : (extractFontFamilyValue(css, templateHeadingSelector) ||
+         extractFontFamilyValue(css, "\\.faq-heading") ||
+         containerFontFamily ||
+         defaultStyles.heading.fontFamily);
+    const descriptionFontFamily = useGenericSelectorsFirst
+      ? (extractFontFamilyValue(css, "\\.faq-description") ||
+         extractFontFamilyValue(css, templateDescriptionSelector) ||
+         containerFontFamily ||
+         defaultStyles.description.fontFamily)
+      : (extractFontFamilyValue(css, templateDescriptionSelector) ||
+         extractFontFamilyValue(css, "\\.faq-description") ||
+         containerFontFamily ||
+         defaultStyles.description.fontFamily);
+    const questionFontFamily = useGenericSelectorsFirst
+      ? (extractFontFamilyValue(css, "\\.faq-question") ||
+         extractFontFamilyValue(css, templateQuestionSelector) ||
+         containerFontFamily ||
+         defaultStyles.question.fontFamily)
+      : (extractFontFamilyValue(css, templateQuestionSelector) ||
+         extractFontFamilyValue(css, "\\.faq-question") ||
+         containerFontFamily ||
+         defaultStyles.question.fontFamily);
+    const answerFontFamily = useGenericSelectorsFirst
+      ? (extractFontFamilyValue(css, "\\.faq-answer") ||
+         extractFontFamilyValue(css, templateAnswerSelector) ||
+         containerFontFamily ||
+         defaultStyles.answer.fontFamily)
+      : (extractFontFamilyValue(css, templateAnswerSelector) ||
+         extractFontFamilyValue(css, "\\.faq-answer") ||
+         containerFontFamily ||
+         defaultStyles.answer.fontFamily);
 
     const spacing = extractSpacing(css);
     const questionPadding = extractPadding(css, templateQuestionSelector)
