@@ -29,6 +29,13 @@ export const templates: Template[] = [
     preview: "bordered",
     locked: true,
   },
+  {
+    id: "split",
+    name: "Split",
+    description: "Two-column layout with dark green background",
+    preview: "split",
+    locked: true,
+  },
 ];
 
 export const defaultStyles = {

@@ -36,7 +36,10 @@ export function AccordionControls({
   const updateAccordion = (updates: Partial<typeof accordion>) => {
     onStylesChange({
       ...styles,
-      accordion: { ...accordion, ...updates },
+      accordion: { 
+        ...styles.accordion, // Preserve all original accordion properties
+        ...updates, // Apply updates
+      },
     });
   };
 
@@ -152,12 +155,13 @@ export function AccordionControls({
                   type="number"
                   min="0"
                   max="10"
-                  value={accordion.borderWidth}
-                  onChange={(e) =>
+                  value={accordion.borderWidth ?? 1}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
                     updateAccordion({
-                      borderWidth: parseInt(e.target.value) || 0,
-                    })
-                  }
+                      borderWidth: isNaN(value) ? 1 : Math.max(0, Math.min(10, value)),
+                    });
+                  }}
                   className="mt-1 h-8 text-xs"
                 />
               </div>

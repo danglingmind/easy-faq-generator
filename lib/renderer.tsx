@@ -1,5 +1,8 @@
 import { FAQConfig } from "./types";
 
+// Legacy renderer - kept for backward compatibility
+// New code should use renderer-v2.tsx
+
 const fontFamilyMap: Record<string, string> = {
   Default: "system-ui, -apple-system, sans-serif",
   Serif: "Georgia, serif",

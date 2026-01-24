@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { IconDeviceDesktop, IconDeviceMobile } from "@tabler/icons-react";
 import { FAQConfig } from "@/lib/types";
-import { renderFAQ } from "@/lib/renderer";
+import { renderFAQSync } from "@/lib/renderer-v2";
+import { generateDefaultTemplate } from "@/lib/template-fallback";
 
 interface PreviewPanelProps {
   config: FAQConfig;
@@ -18,32 +19,43 @@ export function PreviewPanel({
   onPreviewModeChange,
 }: PreviewPanelProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [templateCache, setTemplateCache] = useState<{ html: string; css: string; js?: string } | null>(null);
+
+  // Load template when template ID changes
+  useEffect(() => {
+    const loadTemplate = async () => {
+      try {
+        const response = await fetch(`/api/templates/${config.template}`);
+        if (response.ok) {
+          const template = await response.json();
+          setTemplateCache(template);
+        } else {
+          // Use fallback
+          setTemplateCache(generateDefaultTemplate());
+        }
+      } catch (error) {
+        console.error("Error loading template:", error);
+        setTemplateCache(generateDefaultTemplate());
+      }
+    };
+
+    loadTemplate();
+  }, [config.template]);
 
   useEffect(() => {
-    if (!iframeRef.current) return;
+    if (!iframeRef.current || !templateCache) return;
 
     const iframe = iframeRef.current;
     const doc = iframe.contentDocument || iframe.contentWindow?.document;
     if (!doc) return;
 
-    const { html, css } = renderFAQ(config);
+    // Use template-based renderer
+    const { html } = renderFAQSync(config, templateCache);
 
     doc.open();
-    doc.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1">
-          <style>${css}</style>
-        </head>
-        <body style="margin: 0; padding: 0;">
-          ${html}
-        </body>
-      </html>
-    `);
+    doc.write(html);
     doc.close();
-  }, [config]);
+  }, [config, templateCache]);
 
   return (
     <div className="flex flex-1 flex-col bg-muted/20">

@@ -1,0 +1,148 @@
+/* Split template specific styles */
+.faq-container {
+  background: #1a4d3a !important;
+  padding: 48px !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
+  min-height: 100vh !important;
+}
+
+.faq-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.faq-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.faq-heading {
+  font-family: system-ui, -apple-system, sans-serif !important;
+  font-size: 3.5rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  margin: 0 0 24px 0 !important;
+  line-height: 1.2 !important;
+}
+
+.faq-heading .highlight {
+  color: #a8d5ba !important;
+}
+
+.faq-description {
+  font-family: system-ui, -apple-system, sans-serif !important;
+  font-size: 1.125rem !important;
+  font-weight: 400 !important;
+  color: #ffffff !important;
+  margin: 0 !important;
+  line-height: 1.6 !important;
+  opacity: 0.9 !important;
+}
+
+.faq-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.faq-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.faq-item {
+  margin: 0 0 16px 0 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  overflow: hidden !important;
+}
+
+.faq-question {
+  font-family: system-ui, -apple-system, sans-serif !important;
+  font-size: 1.125rem !important;
+  font-weight: 500 !important;
+  color: #ffffff !important;
+  padding: 0 !important;
+  margin: 0 0 12px 0 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  background: transparent !important;
+  border: none !important;
+  width: 100% !important;
+  text-align: left !important;
+  gap: 16px !important;
+  position: relative !important;
+}
+
+.faq-question:hover {
+  opacity: 0.9;
+}
+
+.faq-question > span:first-child {
+  flex: 0 1 auto;
+}
+
+/* Horizontal line separator */
+.faq-question::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
+  margin-left: 16px;
+}
+
+.faq-answer {
+  font-family: system-ui, -apple-system, sans-serif !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  color: #cbc7c7 !important;
+  padding: 0 0 24px 0 !important;
+  margin: 0 !important;
+  line-height: 1.6 !important;
+  opacity: 0.85 !important;
+}
+
+.faq-answer[hidden] {
+  display: none;
+}
+
+.faq-icon {
+  flex-shrink: 0 !important;
+  width: 16px !important;
+  height: 16px !important;
+  color: #ffffff !important;
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+  margin-left: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Hide the separator when item is open (icon shows minus) */
+.faq-item[data-open="true"] .faq-question::after {
+  display: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .faq-container {
+    padding: 32px 24px;
+  }
+
+  .faq-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .faq-heading {
+    font-size: 2.5rem;
+  }
+}

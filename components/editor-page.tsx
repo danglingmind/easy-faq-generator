@@ -11,6 +11,7 @@ import { InspectorPanel } from "./inspector-panel";
 import { FAQConfig, FAQContent, FAQStyles } from "@/lib/types";
 import { defaultStyles, templates } from "@/lib/templates";
 import { isPaidFeaturesEnabled, saveEditorState, loadEditorState } from "@/lib/utils";
+import { extractTemplateStyles } from "@/lib/template-style-extractor";
 
 export function EditorPage() {
   const { user, isLoaded } = useUser();
@@ -97,6 +98,29 @@ export function EditorPage() {
     loadUserData();
   }, [isLoaded, isSignedIn]);
 
+  // Handle payment success/cancel redirects
+  useEffect(() => {
+    const paymentStatus = searchParams.get("payment");
+    if (paymentStatus === "success") {
+      toast.success("Payment successful! Your account has been upgraded.");
+      // Refresh subscription status
+      if (isSignedIn) {
+        fetch("/api/user/subscription")
+          .then((res) => res.json())
+          .then((data) => {
+            setIsPaid(data.isPaid || isPaidFeaturesEnabled());
+          })
+          .catch(console.error);
+      }
+      // Clean up URL
+      router.replace("/");
+    } else if (paymentStatus === "cancelled") {
+      toast.info("Payment was cancelled.");
+      // Clean up URL
+      router.replace("/");
+    }
+  }, [searchParams, isSignedIn, router]);
+
   const handleContentChange = useCallback((newContent: FAQContent) => {
     setContent(newContent);
   }, []);
@@ -109,6 +133,17 @@ export function EditorPage() {
       if (template && (template.id === "default" || isSignedIn)) {
         if (!template.locked || isPaid) {
           setSelectedTemplate(templateParam);
+          
+          // Load template styles
+          if (templateParam !== "default") {
+            extractTemplateStyles(templateParam).then((templateStyles) => {
+              if (templateStyles) {
+                setStyles(templateStyles);
+              }
+            }).catch(console.error);
+          } else {
+            setStyles(defaultStyles);
+          }
         }
       }
     }
@@ -127,13 +162,15 @@ export function EditorPage() {
     setStyles(newStyles);
   }, []);
 
-  const handleTemplateChange = useCallback((templateId: string) => {
+  const handleTemplateChange = useCallback(async (templateId: string) => {
     const template = templates.find((t) => t.id === templateId);
     if (!template) return;
 
     // Default template is always allowed.
     if (templateId === "default") {
       setSelectedTemplate("default");
+      // Reset to default styles
+      setStyles(defaultStyles);
       return;
     }
 
@@ -147,6 +184,20 @@ export function EditorPage() {
     if (template.locked && !isPaid) return;
 
     setSelectedTemplate(templateId);
+    
+    // Load template styles and populate editor
+    try {
+      const templateStyles = await extractTemplateStyles(templateId);
+      if (templateStyles) {
+        setStyles(templateStyles);
+      } else {
+        // Fallback to default if extraction fails
+        setStyles(defaultStyles);
+      }
+    } catch (error) {
+      console.error("Error loading template styles:", error);
+      setStyles(defaultStyles);
+    }
   }, [isPaid, isSignedIn, router]);
 
   // Create config using useMemo so it's available for callbacks

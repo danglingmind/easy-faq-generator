@@ -1,0 +1,150 @@
+import { FAQStyles } from "./types";
+
+const fontFamilyMap: Record<string, string> = {
+  Default: "system-ui, -apple-system, sans-serif",
+  Serif: "Georgia, serif",
+  Mono: "monospace",
+  Sans: "sans-serif",
+  Inter: "Inter, sans-serif",
+  Roboto: "Roboto, sans-serif",
+  "Open Sans": '"Open Sans", sans-serif',
+  Lato: "Lato, sans-serif",
+  Montserrat: "Montserrat, sans-serif",
+  Poppins: "Poppins, sans-serif",
+};
+
+const fontSizeMap: Record<string, string> = {
+  XS: "0.75rem",
+  SM: "0.875rem",
+  MD: "1rem",
+  LG: "1.125rem",
+  XL: "1.25rem",
+  "2XL": "1.5rem",
+  "3XL": "1.875rem",
+  "4XL": "2.25rem",
+};
+
+const fontWeightMap: Record<string, string> = {
+  Light: "300",
+  Normal: "400",
+  Medium: "500",
+  Semibold: "600",
+  Bold: "700",
+};
+
+/**
+ * Generate dynamic CSS from styles object
+ * This applies user customizations to the template
+ * @param styles - The styles object
+ * @param templateId - Optional template ID to skip certain overrides for template-specific styles
+ */
+export function generateDynamicCSS(styles: FAQStyles, templateId?: string): string {
+  const {
+    heading,
+    description,
+    question,
+    answer,
+    backgroundColor,
+    backgroundGradient,
+    accordion,
+    spacing,
+  } = styles;
+
+  const bg = backgroundGradient || backgroundColor;
+  
+  // Templates that have their own styles that shouldn't be overridden
+  const templateControlledStyles = ['split'];
+  const isTemplateControlled = templateId && templateControlledStyles.includes(templateId);
+
+  // Defensive check for borderSides - ensure it exists and has all properties
+  const borderSides = accordion.borderSides || {
+    top: true,
+    right: true,
+    bottom: true,
+    left: true,
+  };
+
+  // Get border properties with proper defaults
+  const borderVisible = accordion.borderVisible !== undefined ? accordion.borderVisible : true;
+  const borderWidth = accordion.borderWidth ?? 1;
+  const borderStyle = accordion.borderStyle || "solid";
+  const borderColor = accordion.borderColor || "#e5e5e5";
+
+  return `
+    .faq-container {
+      ${!isTemplateControlled ? `background: ${bg} !important;` : ''}
+      padding: ${spacing.sectionPadding}px !important;
+      font-family: ${fontFamilyMap[heading.fontFamily] || fontFamilyMap.Default} !important;
+    }
+    .faq-heading {
+      font-family: ${fontFamilyMap[heading.fontFamily] || fontFamilyMap.Default} !important;
+      font-size: ${fontSizeMap[heading.fontSize]} !important;
+      font-weight: ${fontWeightMap[heading.fontWeight]} !important;
+      ${!isTemplateControlled ? `color: ${heading.color} !important;` : ''}
+    }
+    .faq-description {
+      font-family: ${fontFamilyMap[description.fontFamily] || fontFamilyMap.Default} !important;
+      font-size: ${fontSizeMap[description.fontSize]} !important;
+      font-weight: ${fontWeightMap[description.fontWeight]} !important;
+      ${!isTemplateControlled ? `color: ${description.color} !important;` : ''}
+    }
+    /* Use higher specificity selector for templates that use data-template attribute */
+    ${templateId ? `.faq-container[data-template="${templateId}"] .faq-item` : '.faq-item'} {
+      margin-bottom: ${spacing.itemSpacing}px !important;
+      ${
+        borderVisible
+          ? `
+        /* Explicitly set each border side individually for proper control */
+        ${
+          borderSides.top
+            ? `border-top: ${borderWidth}px ${borderStyle} ${borderColor} !important;`
+            : "border-top: none !important;"
+        }
+        ${
+          borderSides.right
+            ? `border-right: ${borderWidth}px ${borderStyle} ${borderColor} !important;`
+            : "border-right: none !important;"
+        }
+        ${
+          borderSides.bottom
+            ? `border-bottom: ${borderWidth}px ${borderStyle} ${borderColor} !important;`
+            : "border-bottom: none !important;"
+        }
+        ${
+          borderSides.left
+            ? `border-left: ${borderWidth}px ${borderStyle} ${borderColor} !important;`
+            : "border-left: none !important;"
+        }
+      `
+          : `
+        border-top: none !important;
+        border-right: none !important;
+        border-bottom: none !important;
+        border-left: none !important;
+      `
+      }
+    }
+    /* Use higher specificity selector for templates that use data-template attribute */
+    ${templateId ? `.faq-container[data-template="${templateId}"] .faq-question` : '.faq-question'} {
+      font-family: ${fontFamilyMap[question.fontFamily] || fontFamilyMap.Default} !important;
+      font-size: ${fontSizeMap[question.fontSize]} !important;
+      font-weight: ${fontWeightMap[question.fontWeight]} !important;
+      ${!isTemplateControlled ? `color: ${question.color} !important;` : ''}
+      padding: ${accordion.paddingY}px ${accordion.paddingX}px !important;
+      margin: ${accordion.marginY}px ${accordion.marginX}px !important;
+    }
+    ${templateId ? `.faq-container[data-template="${templateId}"] .faq-answer` : '.faq-answer'} {
+      font-family: ${fontFamilyMap[answer.fontFamily] || fontFamilyMap.Default} !important;
+      font-size: ${fontSizeMap[answer.fontSize]} !important;
+      font-weight: ${fontWeightMap[answer.fontWeight]} !important;
+      ${!isTemplateControlled ? `color: ${answer.color} !important;` : ''}
+      padding: 0 ${accordion.paddingX}px ${accordion.paddingY}px !important;
+      margin: 0 ${accordion.marginX}px ${accordion.marginY}px !important;
+      ${accordion.animationType === "Fade" ? `transition: opacity ${accordion.animationDuration}ms !important;` : ""}
+      ${accordion.animationType === "Slide" ? `transition: max-height ${accordion.animationDuration}ms !important;` : ""}
+    }
+    .faq-icon {
+      transition: transform ${accordion.animationDuration}ms !important;
+    }
+  `;
+}

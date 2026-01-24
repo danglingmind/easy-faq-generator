@@ -48,7 +48,9 @@ export async function GET(
       );
     }
 
-    const { html, css } = renderFAQ(config);
+    // Use new template-based renderer
+    const { renderFAQ } = await import("@/lib/renderer-v2");
+    const { html, css } = await renderFAQ(config);
 
     const jsonLd = {
       "@context": "https://schema.org",

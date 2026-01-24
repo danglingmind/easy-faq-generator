@@ -1,0 +1,360 @@
+import { FAQStyles } from "./types";
+import { defaultStyles } from "./templates";
+
+/**
+ * Extract CSS property value from CSS string
+ * Handles multiline CSS and various formats
+ */
+function extractCSSValue(css: string, selector: string, property: string): string | null {
+  // The selector comes with escaped regex characters (like \\. for .)
+  // We need to use it as-is in the regex, but handle quotes in attribute selectors
+  // Match selector followed by {, then find property: value
+  // Use [\s\S] instead of . to match newlines
+  // Use non-greedy matching with ? to stop at first closing brace
+  const regex = new RegExp(
+    `${selector}\\s*\\{([\\s\\S]*?)\\}`,
+    "gi"
+  );
+  
+  // Reset regex lastIndex to ensure we start from the beginning
+  regex.lastIndex = 0;
+  
+  // Find all matches
+  let match;
+  while ((match = regex.exec(css)) !== null) {
+    const blockContent = match[1];
+    // Look for property in this block
+    const propertyRegex = new RegExp(
+      `${property}\\s*:\\s*([^;!\\n]+)`,
+      "i"
+    );
+    const propMatch = blockContent.match(propertyRegex);
+    if (propMatch && propMatch[1]) {
+      return propMatch[1].trim().replace(/!important/gi, "").trim();
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Extract color from CSS (handles hex, rgb, rgba, named colors)
+ */
+function extractColor(css: string, selector: string): string | null {
+  const value = extractCSSValue(css, selector, "color");
+  if (value) {
+    // Remove quotes if present
+    return value.replace(/['"]/g, "");
+  }
+  return null;
+}
+
+/**
+ * Extract background color from CSS
+ * Handles both "background:" and "background-color:" properties
+ */
+function extractBackgroundColor(css: string, selector: string): string | null {
+  // Try background-color first (more specific)
+  let value = extractCSSValue(css, selector, "background-color");
+  
+  // If not found, try background property
+  if (!value) {
+    value = extractCSSValue(css, selector, "background");
+  }
+  
+  if (value) {
+    // Remove quotes if present
+    const cleaned = value.replace(/['"]/g, "").trim();
+    // Skip if it's a gradient, image, or other non-color value
+    if (cleaned && !cleaned.includes("gradient") && !cleaned.includes("url") && !cleaned.includes("transparent")) {
+      // If it's just "transparent", return null
+      if (cleaned === "transparent") {
+        return null;
+      }
+      return cleaned;
+    }
+  }
+  return null;
+}
+
+/**
+ * Extract font size and convert to FAQStyles fontSize enum
+ */
+function extractFontSize(css: string, selector: string): FAQStyles["heading"]["fontSize"] {
+  const value = extractCSSValue(css, selector, "font-size");
+  if (!value) return defaultStyles.heading.fontSize;
+
+  const sizeMap: Record<string, FAQStyles["heading"]["fontSize"]> = {
+    "0.75rem": "XS",
+    "0.875rem": "SM",
+    "1rem": "MD",
+    "1.125rem": "LG",
+    "1.25rem": "XL",
+    "1.5rem": "2XL",
+    "1.875rem": "3XL",
+    "2.25rem": "4XL",
+    "3.5rem": "3XL", // Split template uses 3.5rem
+  };
+
+  // Try exact match first
+  if (sizeMap[value]) {
+    return sizeMap[value];
+  }
+
+  // Try to parse rem values
+  const remMatch = value.match(/([\d.]+)rem/);
+  if (remMatch) {
+    const remValue = parseFloat(remMatch[1]);
+    // Find closest match
+    const remMap: Record<number, FAQStyles["heading"]["fontSize"]> = {
+      0.75: "XS",
+      0.875: "SM",
+      1: "MD",
+      1.125: "LG",
+      1.25: "XL",
+      1.5: "2XL",
+      1.875: "3XL",
+      2.25: "4XL",
+    };
+    const closest = Object.keys(remMap)
+      .map(Number)
+      .reduce((prev, curr) => (Math.abs(curr - remValue) < Math.abs(prev - remValue) ? curr : prev));
+    return remMap[closest] || defaultStyles.heading.fontSize;
+  }
+
+  return defaultStyles.heading.fontSize;
+}
+
+/**
+ * Extract font weight and convert to FAQStyles fontWeight enum
+ */
+function extractFontWeight(css: string, selector: string): FAQStyles["heading"]["fontWeight"] {
+  const value = extractCSSValue(css, selector, "font-weight");
+  if (!value) return defaultStyles.heading.fontWeight;
+
+  const weightMap: Record<string, FAQStyles["heading"]["fontWeight"]> = {
+    "300": "Light",
+    "400": "Normal",
+    "500": "Medium",
+    "600": "Semibold",
+    "700": "Bold",
+    light: "Light",
+    normal: "Normal",
+    medium: "Medium",
+    semibold: "Semibold",
+    bold: "Bold",
+  };
+
+  return weightMap[value.toLowerCase()] || defaultStyles.heading.fontWeight;
+}
+
+/**
+ * Extract padding values
+ */
+function extractPadding(css: string, selector: string): { x: number; y: number } | null {
+  const paddingValue = extractCSSValue(css, selector, "padding");
+  if (!paddingValue) return null;
+
+  // Handle different padding formats: "24px", "24px 32px", etc.
+  const parts = paddingValue.split(/\s+/);
+  if (parts.length === 1) {
+    const px = parseInt(parts[0]);
+    return { x: px, y: px };
+  } else if (parts.length >= 2) {
+    const y = parseInt(parts[0]) || 0;
+    const x = parseInt(parts[1]) || 0;
+    return { x, y };
+  }
+  return null;
+}
+
+/**
+ * Extract spacing values
+ */
+function extractSpacing(css: string): { sectionPadding: number; itemSpacing: number } {
+  const sectionPadding = extractCSSValue(css, "\\.faq-container", "padding");
+  const itemSpacing = extractCSSValue(css, "\\.faq-item", "margin-bottom");
+
+  return {
+    sectionPadding: sectionPadding ? parseInt(sectionPadding) || defaultStyles.spacing.sectionPadding : defaultStyles.spacing.sectionPadding,
+    itemSpacing: itemSpacing ? parseInt(itemSpacing) || defaultStyles.spacing.itemSpacing : defaultStyles.spacing.itemSpacing,
+  };
+}
+
+/**
+ * Extract styles from template CSS and convert to FAQStyles
+ * This is used to populate the editor with template values
+ */
+export async function extractTemplateStyles(templateId: string): Promise<FAQStyles | null> {
+  try {
+    // Fetch template from API
+    const response = await fetch(`/api/templates/${templateId}`);
+    if (!response.ok) {
+      return null;
+    }
+
+    const template = await response.json();
+    const css = template.css || "";
+
+    if (!css) {
+      return null;
+    }
+
+    // Extract values from CSS - try template-specific selector first, then fallback
+    // Escape template ID for regex
+    const escapedTemplateId = templateId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Match both single and double quotes in attribute selector: [data-template="split"] or [data-template='split']
+    // Use character class [\"'] to match either quote type
+    const templateSelector = `\\.faq-container\\[data-template=[\\"']${escapedTemplateId}[\\"']\\]`;
+    const templateHeadingSelector = `${templateSelector}\\s+\\.faq-heading`;
+    const templateDescriptionSelector = `${templateSelector}\\s+\\.faq-description`;
+    const templateQuestionSelector = `${templateSelector}\\s+\\.faq-question`;
+    const templateAnswerSelector = `${templateSelector}\\s+\\.faq-answer`;
+    
+    // Extract background color - try template-specific selector first
+    let backgroundColor = extractBackgroundColor(css, templateSelector);
+    if (!backgroundColor) {
+      // Fallback to generic container selector
+      backgroundColor = extractBackgroundColor(css, "\\.faq-container");
+    }
+    // If still not found, use default
+    if (!backgroundColor) {
+      backgroundColor = defaultStyles.backgroundColor;
+    }
+    const headingColor = extractColor(css, templateHeadingSelector) 
+      || extractColor(css, "\\.faq-heading") 
+      || defaultStyles.heading.color;
+    const descriptionColor = extractColor(css, templateDescriptionSelector)
+      || extractColor(css, "\\.faq-description")
+      || defaultStyles.description.color;
+    const questionColor = extractColor(css, templateQuestionSelector)
+      || extractColor(css, "\\.faq-question")
+      || defaultStyles.question.color;
+    // Extract answer color - try template-specific selector first
+    let answerColor = extractColor(css, templateAnswerSelector);
+    if (!answerColor) {
+      // Fallback to generic answer selector
+      answerColor = extractColor(css, "\\.faq-answer");
+    }
+    // If still not found, use default
+    if (!answerColor) {
+      answerColor = defaultStyles.answer.color;
+    }
+
+    const headingFontSize = extractFontSize(css, templateHeadingSelector)
+      || extractFontSize(css, "\\.faq-heading");
+    const descriptionFontSize = extractFontSize(css, templateDescriptionSelector)
+      || extractFontSize(css, "\\.faq-description");
+    const questionFontSize = extractFontSize(css, templateQuestionSelector)
+      || extractFontSize(css, "\\.faq-question");
+    const answerFontSize = extractFontSize(css, templateAnswerSelector)
+      || extractFontSize(css, "\\.faq-answer");
+
+    const headingFontWeight = extractFontWeight(css, templateHeadingSelector)
+      || extractFontWeight(css, "\\.faq-heading");
+    const descriptionFontWeight = extractFontWeight(css, templateDescriptionSelector)
+      || extractFontWeight(css, "\\.faq-description");
+    const questionFontWeight = extractFontWeight(css, templateQuestionSelector)
+      || extractFontWeight(css, "\\.faq-question");
+    const answerFontWeight = extractFontWeight(css, templateAnswerSelector)
+      || extractFontWeight(css, "\\.faq-answer");
+
+    const spacing = extractSpacing(css);
+    const questionPadding = extractPadding(css, templateQuestionSelector)
+      || extractPadding(css, "\\.faq-question");
+
+    // Extract border properties from template CSS
+    const templateItemSelector = `${templateSelector}\\s+\\.faq-item`;
+    const borderTop = extractCSSValue(css, templateItemSelector, "border-top") 
+      || extractCSSValue(css, "\\.faq-item", "border-top");
+    const borderRight = extractCSSValue(css, templateItemSelector, "border-right")
+      || extractCSSValue(css, "\\.faq-item", "border-right");
+    const borderBottom = extractCSSValue(css, templateItemSelector, "border-bottom")
+      || extractCSSValue(css, "\\.faq-item", "border-bottom");
+    const borderLeft = extractCSSValue(css, templateItemSelector, "border-left")
+      || extractCSSValue(css, "\\.faq-item", "border-left");
+    const border = extractCSSValue(css, templateItemSelector, "border")
+      || extractCSSValue(css, "\\.faq-item", "border");
+    
+    // Determine if border is visible and extract border properties
+    const hasBorder = !!(borderTop || borderRight || borderBottom || borderLeft || (border && border !== "none"));
+    
+    // Extract border color, width, and style from border property or individual sides
+    let borderColor = defaultStyles.accordion.borderColor;
+    let borderWidth = defaultStyles.accordion.borderWidth;
+    let borderStyle: "solid" | "dashed" | "dotted" | "double" | "groove" | "ridge" | "inset" | "outset" = defaultStyles.accordion.borderStyle;
+    
+    if (borderTop || border) {
+      const borderValue = borderTop || border;
+      // Parse border value: "1px solid #e5e5e5" or similar
+      const borderMatch = borderValue.match(/(\d+)px\s+(\w+)\s+(.+)/);
+      if (borderMatch) {
+        borderWidth = parseInt(borderMatch[1]) || borderWidth;
+        borderStyle = (borderMatch[2] as any) || borderStyle;
+        borderColor = borderMatch[3].trim().replace(/['"]/g, "") || borderColor;
+      }
+    }
+    
+    // Determine which sides have borders
+    const borderSides = {
+      top: !!(borderTop && borderTop !== "none"),
+      right: !!(borderRight && borderRight !== "none"),
+      bottom: !!(borderBottom && borderBottom !== "none"),
+      left: !!(borderLeft && borderLeft !== "none"),
+    };
+    
+    // If no individual sides but has border property, assume all sides
+    if (!borderSides.top && !borderSides.right && !borderSides.bottom && !borderSides.left && hasBorder) {
+      borderSides.top = true;
+      borderSides.right = true;
+      borderSides.bottom = true;
+      borderSides.left = true;
+    }
+
+    // Build FAQStyles object
+    const templateStyles: FAQStyles = {
+      ...defaultStyles,
+      backgroundColor,
+      heading: {
+        ...defaultStyles.heading,
+        color: headingColor,
+        fontSize: headingFontSize,
+        fontWeight: headingFontWeight,
+      },
+      description: {
+        ...defaultStyles.description,
+        color: descriptionColor,
+        fontSize: descriptionFontSize,
+        fontWeight: descriptionFontWeight,
+      },
+      question: {
+        ...defaultStyles.question,
+        color: questionColor,
+        fontSize: questionFontSize,
+        fontWeight: questionFontWeight,
+      },
+      answer: {
+        ...defaultStyles.answer,
+        color: answerColor,
+        fontSize: answerFontSize,
+        fontWeight: answerFontWeight,
+      },
+      spacing,
+      accordion: {
+        ...defaultStyles.accordion,
+        paddingX: questionPadding?.x || defaultStyles.accordion.paddingX,
+        paddingY: questionPadding?.y || defaultStyles.accordion.paddingY,
+        borderVisible: hasBorder,
+        borderColor,
+        borderWidth,
+        borderStyle,
+        borderSides,
+      },
+    };
+
+    return templateStyles;
+  } catch (error) {
+    console.error("Error extracting template styles:", error);
+    return null;
+  }
+}
