@@ -32,8 +32,12 @@ export function injectContent(
     `class="faq-container"${templateAttr} ${animationAttrs}`
   );
 
-  // Inject heading
-  html = html.replace(new RegExp(PLACEHOLDERS.HEADING, "g"), escapeHtml(content.heading));
+  // Inject heading (split template uses highlighted word styling)
+  const headingHtml =
+    templateId === "split"
+      ? formatSplitHeading(content.heading)
+      : escapeHtml(content.heading);
+  html = html.replace(new RegExp(PLACEHOLDERS.HEADING, "g"), headingHtml);
 
   // Inject description (optional)
   const descriptionHtml = content.description
@@ -125,6 +129,25 @@ function generateItemsHTML(
   `
     )
     .join("");
+}
+
+function formatSplitHeading(heading: string): string {
+  const safe = heading.trim();
+  if (!safe) return "";
+  const words = safe.split(/\s+/);
+  if (words.length < 2) return escapeHtml(safe);
+
+  const first = escapeHtml(words[0]);
+  const second = escapeHtml(words[1]);
+  const rest = escapeHtml(words.slice(2).join(" "));
+
+  return `
+    <span class="heading-line">
+      <span>${first}</span>
+      <span class="highlight">${second}</span>
+    </span>
+    ${rest ? `<span class="heading-line">${rest}</span>` : ""}
+  `;
 }
 
 /**

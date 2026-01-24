@@ -1,16 +1,18 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@1,500&display=swap");
+
 /* Split template specific styles */
 .faq-container {
-  background: #1a4d3a !important;
-  padding: 48px !important;
-  font-family: system-ui, -apple-system, sans-serif !important;
+  background: #153825 !important;
+  padding: 56px 64px !important;
+  font-family: "Inter", system-ui, -apple-system, sans-serif !important;
   min-height: 100vh !important;
 }
 
 .faq-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 64px;
-  max-width: 1200px;
+  gap: 72px;
+  max-width: 1180px;
   margin: 0 auto;
 }
 
@@ -21,26 +23,36 @@
 }
 
 .faq-heading {
-  font-family: system-ui, -apple-system, sans-serif !important;
-  font-size: 3.5rem !important;
-  font-weight: 700 !important;
-  color: #ffffff !important;
-  margin: 0 0 24px 0 !important;
-  line-height: 1.2 !important;
+  font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+  font-size: 2.75rem !important;
+  font-weight: 600 !important;
+  color: #f2f5ee !important;
+  margin: 0 0 18px 0 !important;
+  line-height: 1.15 !important;
+}
+
+.faq-heading .heading-line {
+  display: block;
+}
+
+.faq-heading .heading-line > span + span {
+  margin-left: 6px;
 }
 
 .faq-heading .highlight {
-  color: #a8d5ba !important;
+  font-family: "Playfair Display", "Times New Roman", serif !important;
+  font-style: italic !important;
+  font-weight: 500 !important;
+  color: #cbdc7a !important;
 }
 
 .faq-description {
-  font-family: system-ui, -apple-system, sans-serif !important;
-  font-size: 1.125rem !important;
+  font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+  font-size: 0.95rem !important;
   font-weight: 400 !important;
-  color: #ffffff !important;
+  color: #c7d2c1 !important;
   margin: 0 !important;
   line-height: 1.6 !important;
-  opacity: 0.9 !important;
 }
 
 .faq-right {
@@ -51,24 +63,26 @@
 .faq-items {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
 .faq-item {
-  margin: 0 0 16px 0 !important;
+  margin: 0 !important;
   border-radius: 0 !important;
   border: none !important;
   background: transparent !important;
   overflow: hidden !important;
+  padding: 16px 0 !important;
+  border-bottom: 1px solid rgba(203, 220, 122, 0.35) !important;
 }
 
 .faq-question {
-  font-family: system-ui, -apple-system, sans-serif !important;
-  font-size: 1.125rem !important;
+  font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+  font-size: 1rem !important;
   font-weight: 500 !important;
-  color: #ffffff !important;
+  color: #e6ece0 !important;
   padding: 0 !important;
-  margin: 0 0 12px 0 !important;
+  margin: 0 !important;
   cursor: pointer !important;
   display: flex !important;
   justify-content: space-between !important;
@@ -77,8 +91,7 @@
   border: none !important;
   width: 100% !important;
   text-align: left !important;
-  gap: 16px !important;
-  position: relative !important;
+  gap: 20px !important;
 }
 
 .faq-question:hover {
@@ -86,27 +99,17 @@
 }
 
 .faq-question > span:first-child {
-  flex: 0 1 auto;
-}
-
-/* Horizontal line separator */
-.faq-question::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.3);
-  margin-left: 16px;
+  flex: 1 1 auto;
 }
 
 .faq-answer {
-  font-family: system-ui, -apple-system, sans-serif !important;
-  font-size: 1rem !important;
+  font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+  font-size: 0.9rem !important;
   font-weight: 400 !important;
-  color: #cbc7c7 !important;
-  padding: 0 0 24px 0 !important;
+  color: #aeb9a4 !important;
+  padding: 10px 0 0 0 !important;
   margin: 0 !important;
   line-height: 1.6 !important;
-  opacity: 0.85 !important;
 }
 
 .faq-answer[hidden] {
@@ -117,7 +120,7 @@
   flex-shrink: 0 !important;
   width: 16px !important;
   height: 16px !important;
-  color: #ffffff !important;
+  color: #d9e3cf !important;
   stroke: currentColor !important;
   stroke-width: 2 !important;
   margin-left: 16px !important;
@@ -126,9 +129,9 @@
   justify-content: center !important;
 }
 
-/* Hide the separator when item is open (icon shows minus) */
-.faq-item[data-open="true"] .faq-question::after {
-  display: none;
+/* Rotate icon when open */
+.faq-item[data-open="true"] .faq-icon {
+  transform: rotate(180deg);
 }
 
 /* Responsive design */
@@ -139,10 +142,10 @@
 
   .faq-layout {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 32px;
   }
 
   .faq-heading {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
   }
 }
