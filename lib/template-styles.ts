@@ -13,6 +13,15 @@ const fontFamilyMap: Record<string, string> = {
   Poppins: "Poppins, sans-serif",
 };
 
+const googleFontFamilyMap: Record<string, string> = {
+  Inter: "Inter:wght@300;400;500;600;700",
+  Roboto: "Roboto:wght@300;400;500;700",
+  "Open Sans": "Open+Sans:wght@300;400;600;700",
+  Lato: "Lato:wght@300;400;700",
+  Montserrat: "Montserrat:wght@300;400;500;600;700",
+  Poppins: "Poppins:wght@300;400;500;600;700",
+};
+
 const fontSizeMap: Record<string, string> = {
   XS: "0.75rem",
   SM: "0.875rem",
@@ -51,6 +60,20 @@ export function generateDynamicCSS(styles: FAQStyles, templateId?: string): stri
   } = styles;
 
   const bg = backgroundGradient || backgroundColor;
+  const fontsToLoad = new Set<string>();
+  [heading.fontFamily, description.fontFamily, question.fontFamily, answer.fontFamily].forEach(
+    (font) => {
+      if (font && googleFontFamilyMap[font]) {
+        fontsToLoad.add(googleFontFamilyMap[font]);
+      }
+    }
+  );
+  const googleFontsImport =
+    fontsToLoad.size > 0
+      ? `@import url("https://fonts.googleapis.com/css2?${Array.from(fontsToLoad)
+          .map((family) => `family=${family}`)
+          .join("&")}&display=swap");\n`
+      : "";
   
   // Templates that have their own styles that shouldn't be overridden
   const templateControlledStyles = ['split'];
@@ -71,6 +94,7 @@ export function generateDynamicCSS(styles: FAQStyles, templateId?: string): stri
   const borderColor = accordion.borderColor || "#e5e5e5";
 
   return `
+    ${googleFontsImport}
     .faq-container {
       ${!isTemplateControlled ? `background: ${bg} !important;` : ''}
       padding: ${spacing.sectionPadding}px !important;

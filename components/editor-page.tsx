@@ -12,6 +12,7 @@ import { FAQConfig, FAQContent, FAQStyles } from "@/lib/types";
 import { defaultStyles, templates } from "@/lib/templates";
 import { isPaidFeaturesEnabled, saveEditorState, loadEditorState } from "@/lib/utils";
 import { extractTemplateStyles } from "@/lib/template-style-extractor";
+import { buildEmbedPayload } from "@/lib/embed-payload";
 
 export function EditorPage() {
   const { user, isLoaded } = useUser();
@@ -220,13 +221,24 @@ export function EditorPage() {
     if (embedCopied && !isPaid) return;
 
     try {
+      let renderedPayload = null;
+      try {
+        const templateResponse = await fetch(`/api/templates/${config.template}`);
+        if (templateResponse.ok) {
+          const template = await templateResponse.json();
+          renderedPayload = buildEmbedPayload(config, template);
+        }
+      } catch (error) {
+        console.warn("Failed to build rendered payload:", error);
+      }
+
       // Save embed to database
       const response = await fetch("/api/embeds", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ config }),
+        body: JSON.stringify({ config, rendered: renderedPayload }),
       });
 
       if (!response.ok) {

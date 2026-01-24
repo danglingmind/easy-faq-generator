@@ -2,12 +2,17 @@ import { eq, and } from "drizzle-orm";
 import { db, embeds, userUsage, userSubscriptions } from "./index";
 import { FAQConfig } from "../types";
 
-export async function createEmbed(userId: string, config: FAQConfig) {
+export async function createEmbed(
+  userId: string,
+  config: FAQConfig,
+  rendered?: { html: string; css: string; schema: unknown }
+) {
   const [embed] = await db
     .insert(embeds)
     .values({
       userId,
       config,
+      ...(rendered ? { rendered } : {}),
     })
     .returning();
 

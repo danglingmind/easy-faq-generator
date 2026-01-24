@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const config: FAQConfig = body.config;
+    const rendered = body.rendered;
 
     if (!config) {
       return NextResponse.json(
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const embed = await createEmbed(userId, config);
+    const embed = await createEmbed(userId, config, rendered);
 
     return NextResponse.json({
       embedId: embed.id,

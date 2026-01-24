@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { renderFAQ } from "@/lib/renderer";
 import { FAQConfig } from "@/lib/types";
 import { getEmbedById, getUserSubscription } from "@/lib/db/queries";
 import { isPaidFeaturesEnabled } from "@/lib/utils";
@@ -48,22 +47,33 @@ export async function GET(
       );
     }
 
-    // Use new template-based renderer
-    const { renderFAQ } = await import("@/lib/renderer-v2");
-    const { html, css } = await renderFAQ(config);
+    let html: string;
+    let css: string;
+    let jsonLd: Record<string, unknown>;
 
-    const jsonLd = {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: config.content.items.map((item) => ({
-        "@type": "Question",
-        name: item.question || "",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: item.answer || "",
-        },
-      })),
-    };
+    if (embed.rendered?.html && embed.rendered?.css && embed.rendered?.schema) {
+      html = embed.rendered.html;
+      css = embed.rendered.css;
+      jsonLd = embed.rendered.schema as Record<string, unknown>;
+    } else {
+      // Fallback to template-based renderer if rendered payload is missing
+      const { renderFAQ } = await import("@/lib/renderer-v2");
+      const { html: fallbackHtml, css: fallbackCss } = await renderFAQ(config);
+      html = fallbackHtml;
+      css = fallbackCss;
+      jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: config.content.items.map((item) => ({
+          "@type": "Question",
+          name: item.question || "",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: item.answer || "",
+          },
+        })),
+      };
+    }
 
     // Generate integrity hash (simplified)
     const payload = JSON.stringify({ html, css, schema: jsonLd });

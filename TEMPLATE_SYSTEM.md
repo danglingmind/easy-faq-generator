@@ -59,6 +59,18 @@ The actual visual appearance is controlled by the `FAQStyles` object:
 - **Accordion**: Border styles, padding, margins, animations, icons
 - **Spacing**: Section padding, item spacing
 
+**Font Weight Mapping (Template ↔ Editor)**
+
+Template CSS uses numeric `font-weight`, while the editor uses labels. Use this mapping when authoring template CSS:
+
+| Editor Label | CSS `font-weight` |
+|-------------|-------------------|
+| Light       | 300               |
+| Normal      | 400               |
+| Medium      | 500               |
+| Semibold    | 600               |
+| Bold        | 700               |
+
 The `renderFAQ()` function in `lib/renderer.tsx` takes the `FAQConfig` (which includes `content`, `template`, and `styles`) and generates the final HTML and CSS.
 
 #### 3. Template Selection Flow

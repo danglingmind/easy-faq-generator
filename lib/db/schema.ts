@@ -17,6 +17,11 @@ export const embeds = pgTable("embeds", {
     template: string;
     styles: any;
   }>(),
+  rendered: jsonb("rendered").$type<{
+    html: string;
+    css: string;
+    schema: any;
+  }>(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

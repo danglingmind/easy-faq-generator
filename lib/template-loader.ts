@@ -53,11 +53,7 @@ export function injectContent(
   const jsonLd = generateJSONLD(content);
   html = html.replace(new RegExp(PLACEHOLDERS.JSON_LD, "g"), jsonLd);
 
-  // Generate dynamic CSS from styles object and merge with template CSS
-  // Dynamic CSS comes AFTER template CSS so user customizations override template defaults
-  // Pass templateId to skip certain overrides for template-specific styles
-  const dynamicCSS = generateDynamicCSS(styles, templateId);
-  const combinedCSS = `/* Template Base Styles */\n${template.css}\n\n/* User Customizations */\n${dynamicCSS}`;
+  const combinedCSS = buildCombinedCSS(template, styles, templateId);
 
   // Inject CSS (replace {{styles}} placeholder or append to head)
   if (html.includes(PLACEHOLDERS.STYLES)) {
@@ -81,6 +77,18 @@ export function injectContent(
   }
 
   return html;
+}
+
+export function buildCombinedCSS(
+  template: TemplateFile,
+  styles: FAQStyles,
+  templateId?: string
+): string {
+  // Generate dynamic CSS from styles object and merge with template CSS
+  // Dynamic CSS comes AFTER template CSS so user customizations override template defaults
+  // Pass templateId to skip certain overrides for template-specific styles
+  const dynamicCSS = generateDynamicCSS(styles, templateId);
+  return `/* Template Base Styles */\n${template.css}\n\n/* User Customizations */\n${dynamicCSS}`;
 }
 
 /**
