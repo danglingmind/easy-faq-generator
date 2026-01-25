@@ -308,7 +308,6 @@
                     }
                     
                     console.log("[FAQ Embed] Accordion script execution attempt completed");
-                  }, 50);
                   } catch (evalError) {
                     console.error("[FAQ Embed] Error executing embed script:", evalError);
                     console.error("[FAQ Embed] Script content (first 200 chars):", scriptContent.substring(0, 200));
@@ -325,7 +324,7 @@
                       console.error("[FAQ Embed] Fallback script execution also failed:", fallbackError);
                     }
                   }
-                }, 100); // Increased delay to ensure DOM is fully ready
+                }, 50);
               });
             });
           } catch (error) {
