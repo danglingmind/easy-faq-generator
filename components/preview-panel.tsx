@@ -7,6 +7,7 @@ import { IconDeviceDesktop, IconDeviceMobile, IconCopy, IconCheck } from "@table
 import { FAQConfig } from "@/lib/types";
 import { renderFAQSync } from "@/lib/renderer-v2";
 import { generateDefaultTemplate } from "@/lib/template-fallback";
+import { isCodePreviewEnabled } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface PreviewPanelProps {
@@ -26,6 +27,16 @@ export function PreviewPanel({
   const [templateCache, setTemplateCache] = useState<{ html: string; css: string; js?: string } | null>(null);
   const [codeCopied, setCodeCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("preview");
+  
+  // Check if code preview feature is enabled
+  const codePreviewEnabled = isCodePreviewEnabled();
+
+  // Reset to preview tab if code preview is disabled and user is on code tab
+  useEffect(() => {
+    if (!codePreviewEnabled && activeTab === "code") {
+      setActiveTab("preview");
+    }
+  }, [codePreviewEnabled, activeTab]);
 
   // Generate complete HTML code (the same HTML that gets injected by the embed script)
   const completeHTMLCode = useMemo(() => {
@@ -326,7 +337,9 @@ export function PreviewPanel({
         <div className="flex items-center justify-between border-b bg-background px-4 py-2 shrink-0">
           <TabsList>
             <TabsTrigger value="preview">Live Preview</TabsTrigger>
-            <TabsTrigger value="code">Code View</TabsTrigger>
+            {codePreviewEnabled && (
+              <TabsTrigger value="code">Code View</TabsTrigger>
+            )}
           </TabsList>
           {activeTab === "preview" && (
             <div className="flex items-center gap-1 rounded-md border p-1">
@@ -348,7 +361,7 @@ export function PreviewPanel({
               </Button>
             </div>
           )}
-          {activeTab === "code" && (
+          {codePreviewEnabled && activeTab === "code" && (
             <Button
               variant="default"
               size="sm"
@@ -384,20 +397,22 @@ export function PreviewPanel({
             </div>
           </div>
         </TabsContent>
-        <TabsContent value="code" className="flex flex-1 m-0 mt-0 overflow-hidden min-h-0 data-[state=active]:flex data-[state=inactive]:hidden">
-          <div className="h-full w-full overflow-auto bg-background p-4 min-h-0">
-            <div className="relative h-full min-h-0">
-              <pre className="h-full overflow-auto rounded-md border bg-muted p-4 text-sm font-mono min-h-0">
-                <code className="text-foreground whitespace-pre">{completeHTMLCode}</code>
-              </pre>
-              {!currentEmbedId && (
-                <div className="absolute top-4 right-4 rounded-md bg-blue-100 dark:bg-blue-900/20 px-3 py-2 text-xs text-blue-800 dark:text-blue-200 border border-blue-300 dark:border-blue-800 max-w-xs z-10">
-                  <strong>Note:</strong> This is the complete HTML that will be injected by the embed script. Save your embed to get a real embed ID.
-                </div>
-              )}
+        {codePreviewEnabled && (
+          <TabsContent value="code" className="flex flex-1 m-0 mt-0 overflow-hidden min-h-0 data-[state=active]:flex data-[state=inactive]:hidden">
+            <div className="h-full w-full overflow-auto bg-background p-4 min-h-0">
+              <div className="relative h-full min-h-0">
+                <pre className="h-full overflow-auto rounded-md border bg-muted p-4 text-sm font-mono min-h-0">
+                  <code className="text-foreground whitespace-pre">{completeHTMLCode}</code>
+                </pre>
+                {!currentEmbedId && (
+                  <div className="absolute top-4 right-4 rounded-md bg-blue-100 dark:bg-blue-900/20 px-3 py-2 text-xs text-blue-800 dark:text-blue-200 border border-blue-300 dark:border-blue-800 max-w-xs z-10">
+                    <strong>Note:</strong> This is the complete HTML that will be injected by the embed script. Save your embed to get a real embed ID.
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </TabsContent>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );

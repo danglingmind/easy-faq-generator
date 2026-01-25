@@ -11,6 +11,12 @@ export function isPaidFeaturesEnabled(): boolean {
   return process.env.NEXT_PUBLIC_ENABLE_PAID_FEATURES === "true";
 }
 
+// Check if code preview feature is enabled via env var
+// Set NEXT_PUBLIC_ENABLE_CODE_PREVIEW=true to enable the live code preview panel
+export function isCodePreviewEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_ENABLE_CODE_PREVIEW === "true";
+}
+
 // Storage keys for preserving editor state
 const STORAGE_KEY = "faq-editor-state";
 
