@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -138,25 +139,15 @@ export function LandingPage() {
 
           {/* Right Column - Visual/Preview */}
           <div className="relative">
-            <div className="relative rounded-xl border border-border bg-card p-8 shadow-2xl">
-              <div className="space-y-4">
-                <div className="h-4 w-3/4 bg-primary/20 rounded animate-pulse" />
-                <div className="space-y-2">
-                  <div className="h-3 w-full bg-muted rounded" />
-                  <div className="h-3 w-5/6 bg-muted rounded" />
-                </div>
-                <div className="pt-4 space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-                      <div className="flex-1 space-y-2">
-                        <div className="h-3 w-full bg-muted rounded" />
-                        <div className="h-3 w-4/5 bg-muted/60 rounded" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <div className="relative rounded-xl overflow-hidden border border-border bg-card shadow-2xl">
+              <Image
+                src="/hero-faq-preview.png"
+                alt="FAQ Section Preview - Q&A accordion interface"
+                width={600}
+                height={600}
+                className="w-full h-auto object-cover"
+                priority
+              />
             </div>
             <div className="absolute -z-10 -inset-4 bg-primary/5 rounded-xl blur-2xl" />
           </div>
