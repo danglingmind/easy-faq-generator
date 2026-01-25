@@ -17,18 +17,25 @@
   {{jsonLd}}
   <script>
     (function () {
+      console.log("[FAQ Accordion] Script starting...");
+      
       function getConfig(container) {
         const type = container.getAttribute("data-animation-type") || "Fade";
         const duration = parseInt(container.getAttribute("data-animation-duration") || "300", 10);
         const mode = container.getAttribute("data-accordion-mode") || "single";
+        console.log("[FAQ Accordion] Config:", { type, duration, mode });
         return { type, duration, mode };
       }
 
       function setAnswerState(item, isOpen, config) {
         const button = item.querySelector("[data-accordion-button]");
         const answer = item.querySelector(".faq-answer");
-        if (!button || !answer) return;
+        if (!button || !answer) {
+          console.warn("[FAQ Accordion] Missing button or answer in item");
+          return;
+        }
 
+        console.log("[FAQ Accordion] Setting answer state:", { isOpen, itemId: item.id || "unknown" });
         item.setAttribute("data-open", isOpen ? "true" : "false");
         button.setAttribute("aria-expanded", String(isOpen));
 
@@ -54,12 +61,18 @@
       }
 
       function init(container) {
+        console.log("[FAQ Accordion] Initializing container:", container);
         const config = getConfig(container);
         const items = Array.from(container.querySelectorAll(".faq-item"));
+        console.log("[FAQ Accordion] Found", items.length, "FAQ items");
+        
         items.forEach((item, index) => {
           const button = item.querySelector("[data-accordion-button]");
           const answer = item.querySelector(".faq-answer");
-          if (!button || !answer) return;
+          if (!button || !answer) {
+            console.warn("[FAQ Accordion] Item", index, "missing button or answer");
+            return;
+          }
 
           if (!answer.id) answer.id = "faq-answer-" + index;
           if (!button.id) button.id = "faq-question-" + index;
@@ -68,11 +81,14 @@
           answer.setAttribute("aria-labelledby", button.id);
 
           const isOpen = item.getAttribute("data-open") === "true";
+          console.log("[FAQ Accordion] Item", index, "initial state:", isOpen);
           setAnswerState(item, isOpen, config);
 
           button.addEventListener("click", () => {
+            console.log("[FAQ Accordion] Button clicked for item", index);
             const currentlyOpen = item.getAttribute("data-open") === "true";
             const nextOpen = !currentlyOpen;
+            console.log("[FAQ Accordion] Toggling from", currentlyOpen, "to", nextOpen);
             if (config.mode === "single" && nextOpen) {
               items.forEach((other) => {
                 if (other !== item) {
@@ -82,10 +98,19 @@
             }
             setAnswerState(item, nextOpen, config);
           });
+          console.log("[FAQ Accordion] Event listener attached to item", index);
         });
+        console.log("[FAQ Accordion] Initialization complete for container");
       }
 
-      document.querySelectorAll(".faq-container").forEach(init);
+      const containers = document.querySelectorAll(".faq-container");
+      console.log("[FAQ Accordion] Found", containers.length, "FAQ container(s)");
+      if (containers.length === 0) {
+        console.error("[FAQ Accordion] No .faq-container elements found!");
+        console.log("[FAQ Accordion] Available elements:", document.querySelectorAll("*").length);
+      }
+      containers.forEach(init);
+      console.log("[FAQ Accordion] Script execution complete");
     })();
   </script>
 </body>

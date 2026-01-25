@@ -115,11 +115,11 @@ export function EditorPage() {
           .catch(console.error);
       }
       // Clean up URL
-      router.replace("/");
+      router.replace("/editor");
     } else if (paymentStatus === "cancelled") {
       toast.info("Payment was cancelled.");
       // Clean up URL
-      router.replace("/");
+      router.replace("/editor");
     }
   }, [searchParams, isSignedIn, router]);
 
@@ -274,7 +274,11 @@ export function EditorPage() {
       }
 
       const { embedId, reused } = await response.json();
-      const embedCode = `<div data-faq-embed="${embedId}"></div>\n<script src="${window.location.origin}/faq-embed.js" async></script>`;
+      // Always use NEXT_PUBLIC_APP_URL for embed script source to ensure it points to the correct domain
+      // This is critical because window.location.origin would be wrong if accessed from a different domain
+      const appOrigin = process.env.NEXT_PUBLIC_APP_URL || 'https://easy-faq-generator.fly.dev';
+      // Include data-faq-origin so the embed script knows where to fetch from, even when embedded on other domains
+      const embedCode = `<div data-faq-embed="${embedId}" data-faq-origin="${appOrigin}"></div>\n<script src="${appOrigin}/faq-embed.js" async></script>`;
 
       // Update the current embed ID if we got a new one
       setCurrentEmbedId(embedId);
@@ -337,6 +341,7 @@ export function EditorPage() {
           config={config}
           previewMode={previewMode}
           onPreviewModeChange={setPreviewMode}
+          currentEmbedId={currentEmbedId}
         />
         <InspectorPanel
           selectedTemplate={selectedTemplate}

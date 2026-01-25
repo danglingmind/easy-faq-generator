@@ -1,33 +1,42 @@
-# fly.toml app configuration file generated for easy-faq-generator
+# fly.toml app configuration file generated for easy-faq-generator on 2026-01-25T11:42:52+05:30
+#
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = "easy-faq-generator"
-primary_region = "bom"
+app = 'easy-faq-generator'
+primary_region = 'bom'
 
 [build]
-
+  dockerfile = "Dockerfile"
+  # Build-time arguments for NEXT_PUBLIC_* variables
+  # These are safe to expose as they're embedded in client-side code anyway
+  # Fill in the actual values from your .env file
+  [build.args]
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = "pk_test_Z2xhZC1waWdsZXQtNTguY2xlcmsuYWNjb3VudHMuZGV2JA"
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = "pk_test_51SM1VFSOzfdP0mOgkPqqk45GVHMZB3YfaseTh5Dv0ajkJOlfZdibDWcCkEyPHmWxwaT0duiZ3t7PLG5IMHdLxc4b00y7WTcJiN"
+    NEXT_PUBLIC_APP_URL = "https://easy-faq-generator.fly.dev"
 [env]
-  NODE_ENV = "production"
-  PORT = "3000"
+  NODE_ENV = 'production'
+  PORT = '3000'
 
 [http_service]
   internal_port = 3000
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-  processes = ["app"]
+  processes = ['app']
 
   [[http_service.checks]]
-    interval = "10s"
-    timeout = "2s"
-    grace_period = "5s"
-    method = "GET"
-    path = "/"
-    protocol = "http"
+    interval = '15s'
+    timeout = '5s'
+    grace_period = '30s'
+    method = 'GET'
+    path = '/api/health'
+    protocol = 'http'
     tls_skip_verify = false
 
 [[vm]]
-  cpu_kind = "shared"
+  memory = '512mb'
   cpus = 1
   memory_mb = 512

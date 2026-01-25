@@ -21,10 +21,33 @@ async function assertLicenseValid(userId: string): Promise<boolean> {
   return subscription?.isPaid || false;
 }
 
+// Helper function to get CORS headers
+function getCorsHeaders(origin?: string | null) {
+  return {
+    "Access-Control-Allow-Origin": origin || "*",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Max-Age": "86400",
+    "Vary": "Origin",
+  };
+}
+
+// Handle CORS preflight requests
+export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get("origin");
+  return new NextResponse(null, {
+    status: 200,
+    headers: getCorsHeaders(origin),
+  });
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ embedId: string }> }
 ) {
+  const origin = request.headers.get("origin");
+  const corsHeaders = getCorsHeaders(origin);
+  
   try {
     const { embedId } = await params;
 
@@ -32,7 +55,10 @@ export async function GET(
     if (!embed) {
       return NextResponse.json(
         { error: "Embed not found" },
-        { status: 404 }
+        { 
+          status: 404,
+          headers: corsHeaders,
+        }
       );
     }
 
@@ -43,7 +69,10 @@ export async function GET(
     if (!isValid) {
       return NextResponse.json(
         { error: "License validation failed" },
-        { status: 403 }
+        { 
+          status: 403,
+          headers: corsHeaders,
+        }
       );
     }
 
@@ -79,17 +108,28 @@ export async function GET(
     const payload = JSON.stringify({ html, css, schema: jsonLd });
     const integrity = Buffer.from(payload).toString("base64").slice(0, 16);
 
-    return NextResponse.json({
-      html,
-      css,
-      schema: jsonLd,
-      integrity,
-    });
+    return NextResponse.json(
+      {
+        html,
+        css,
+        schema: jsonLd,
+        integrity,
+      },
+      {
+        headers: {
+          ...corsHeaders,
+          "Cache-Control": "public, max-age=3600", // Cache for 1 hour
+        },
+      }
+    );
   } catch (error) {
     console.error("Embed generation error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: corsHeaders,
+      }
     );
   }
 }

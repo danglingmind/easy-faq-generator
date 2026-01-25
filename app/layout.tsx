@@ -26,6 +26,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
 };
 
+// Force dynamic rendering to prevent Clerk validation errors during build
+// Real secrets from Fly.io will be used at runtime
+export const dynamic = 'force-dynamic';
+
 export default function RootLayout({
   children,
 }: Readonly<{

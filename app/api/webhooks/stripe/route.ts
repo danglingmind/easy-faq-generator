@@ -4,13 +4,19 @@ import { stripe } from "@/lib/stripe";
 import { createOrUpdateUserSubscription } from "@/lib/db/queries";
 import Stripe from "stripe";
 
+// STRIPE_WEBHOOK_SECRET is set via Fly.io secrets at runtime
+// Fallback value allows build to complete even if STRIPE_WEBHOOK_SECRET is not set
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-if (!webhookSecret) {
-  throw new Error("STRIPE_WEBHOOK_SECRET is not set");
-}
-
 export async function POST(request: NextRequest) {
+  // Validate webhook secret at runtime (not during build)
+  if (!webhookSecret || webhookSecret === "whsec_dummy_for_build_time_only") {
+    return NextResponse.json(
+      { error: "STRIPE_WEBHOOK_SECRET is not configured" },
+      { status: 500 }
+    );
+  }
+
   const body = await request.text();
   const headersList = await headers();
   const signature = headersList.get("stripe-signature");
@@ -25,7 +31,7 @@ export async function POST(request: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret!);
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (error: any) {
     console.error("Webhook signature verification failed:", error.message);
     return NextResponse.json(

@@ -8,6 +8,18 @@ This guide will help you deploy the Easy FAQ Generator to Fly.io in the BOM (Mum
 2. Sign up for a [Fly.io account](https://fly.io/app/sign-up)
 3. Login to Fly.io: `flyctl auth login`
 
+## Before Deploying
+
+### Sync package-lock.json
+
+**Important**: Ensure your `package-lock.json` is in sync with `package.json` before deploying:
+
+```bash
+npm install
+```
+
+This will regenerate the lock file and ensure all dependencies (including transitive ones) are properly recorded. If you see errors about missing packages in the lock file during build, run this command and commit the updated `package-lock.json`.
+
 ## Initial Setup
 
 ### 1. Launch the App (First Time Only)
@@ -31,16 +43,22 @@ The app requires several environment variables. Set them using `flyctl secrets s
 
 #### Required Secrets (Sensitive Data)
 
+> **Note**: The Dockerfile uses dummy values for `DATABASE_URL` and `STRIPE_SECRET_KEY` during build to allow Next.js to evaluate modules. These are **only used during build** - your real secrets (set below) will be used at runtime.
+
 ```bash
-# Database
+# Database (set as secret for runtime - dummy value used during build)
 flyctl secrets set DATABASE_URL="your-neon-database-url"
+
+# Stripe (set as secret for runtime - dummy value used during build)
+flyctl secrets set STRIPE_SECRET_KEY="your-stripe-secret-key"
+flyctl secrets set STRIPE_WEBHOOK_SECRET="your-stripe-webhook-secret"
+flyctl secrets set STRIPE_PRICE_ID="your-stripe-price-id"
 
 # Clerk Authentication
 flyctl secrets set NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your-clerk-publishable-key"
 flyctl secrets set CLERK_SECRET_KEY="your-clerk-secret-key"
 
-# Stripe
-flyctl secrets set STRIPE_SECRET_KEY="your-stripe-secret-key"
+# Stripe Price ID
 flyctl secrets set STRIPE_PRICE_ID="your-stripe-price-id"
 
 # Cloudflare R2 (Optional - for template storage)
@@ -64,7 +82,27 @@ flyctl secrets set NEXT_PUBLIC_APP_URL="https://your-app-name.fly.dev"
 flyctl secrets set NEXT_PUBLIC_ENABLE_PAID_FEATURES="true"
 ```
 
-### 3. Run Database Migrations (First Time)
+### 3. Set Required Secrets
+
+Set your secrets before deploying. These will be used at runtime (dummy values in Dockerfile handle build-time):
+
+```bash
+# Database
+flyctl secrets set DATABASE_URL="your-neon-database-url"
+
+# Stripe
+flyctl secrets set STRIPE_SECRET_KEY="your-stripe-secret-key"
+flyctl secrets set STRIPE_WEBHOOK_SECRET="your-stripe-webhook-secret"
+flyctl secrets set STRIPE_PRICE_ID="your-stripe-price-id"
+
+# Clerk Authentication
+flyctl secrets set NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your-clerk-publishable-key"
+flyctl secrets set CLERK_SECRET_KEY="your-clerk-secret-key"
+```
+
+> **Note**: The Dockerfile uses dummy values for build-time environment variables (`DATABASE_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `NEXT_PUBLIC_APP_URL`) because Next.js evaluates modules during build. Your real secrets set above will override these at runtime. This is the standard approach per Fly.io documentation.
+
+### 4. Run Database Migrations (First Time)
 
 Before deploying, ensure your database schema is up to date. Run migrations locally or on a one-off Fly.io machine:
 
@@ -82,7 +120,7 @@ flyctl ssh console -C "npm run db:migrate"
 
 > **Note**: Drizzle ORM doesn't require client generation (unlike Prisma). The schema files are TypeScript that get compiled automatically during the build. Only migrations need to be run separately.
 
-### 4. Deploy
+### 5. Deploy
 
 Deploy your application:
 
@@ -96,7 +134,7 @@ This will:
 - Deploy to the BOM region
 - Start your application
 
-### 5. Update App URL
+### 6. Update App URL
 
 After the first deployment, update your app URL:
 
@@ -238,6 +276,7 @@ If you update your schema (`lib/db/schema.ts`):
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` - Clerk publishable key
 - `CLERK_SECRET_KEY` - Clerk secret key
 - `STRIPE_SECRET_KEY` - Stripe secret key
+- `STRIPE_WEBHOOK_SECRET` - Stripe webhook signing secret
 - `NEXT_PUBLIC_APP_URL` - Your app's public URL
 
 ### Optional

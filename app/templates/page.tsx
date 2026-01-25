@@ -24,7 +24,7 @@ function TemplatesPageContent() {
 
     // Default template is always allowed
     if (templateId === "default") {
-      router.push(`/?template=${templateId}`);
+      router.push(`/editor?template=${templateId}`);
       return;
     }
 
@@ -39,7 +39,7 @@ function TemplatesPageContent() {
       return;
     }
 
-    router.push(`/?template=${templateId}`);
+    router.push(`/editor?template=${templateId}`);
   };
 
   if (!isLoaded) {
@@ -123,7 +123,7 @@ function TemplatesPageContent() {
         </div>
 
         <div className="mt-8 text-center">
-          <Button variant="outline" onClick={() => router.push("/")}>
+          <Button variant="outline" onClick={() => router.push("/editor")}>
             Back to Editor
           </Button>
         </div>
