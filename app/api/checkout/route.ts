@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import Stripe from "stripe";
 import { stripe, PRICE_ID, getStripeUrls } from "@/lib/stripe";
 import { getUserSubscription, createOrUpdateUserSubscription } from "@/lib/db/queries";
 

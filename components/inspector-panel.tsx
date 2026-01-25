@@ -31,7 +31,7 @@ interface InspectorPanelProps {
   isSignedIn: boolean;
   embedCopied: boolean;
   onCopyEmbed: () => void;
-  onLoadEmbed?: (config: FAQConfig) => void;
+  onLoadEmbed?: (config: FAQConfig, embedId: string) => void;
 }
 
 export function InspectorPanel({
@@ -70,7 +70,11 @@ export function InspectorPanel({
               Browse Templates
             </Button>
           </div>
-          <Select value={selectedTemplate} onValueChange={onTemplateChange}>
+          <Select value={selectedTemplate} onValueChange={(value: string | null) => {
+            if (value) {
+              onTemplateChange(value);
+            }
+          }}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { Card } from "@/components/ui/card";
@@ -8,7 +9,7 @@ import { templates } from "@/lib/templates";
 import { IconLock, IconCheck } from "@tabler/icons-react";
 import { isPaidFeaturesEnabled } from "@/lib/utils";
 
-export default function TemplatesPage() {
+function TemplatesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isLoaded } = useUser();
@@ -128,5 +129,17 @@ export default function TemplatesPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function TemplatesPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    }>
+      <TemplatesPageContent />
+    </Suspense>
   );
 }

@@ -60,9 +60,11 @@ export function AccordionControls({
           <Label className="text-xs">Icon Style</Label>
           <Select
             value={accordion.iconStyle}
-            onValueChange={(value: "Chevron" | "Plus") =>
-              updateAccordion({ iconStyle: value })
-            }
+            onValueChange={(value: "Chevron" | "Plus" | null) => {
+              if (value) {
+                updateAccordion({ iconStyle: value });
+              }
+            }}
           >
             <SelectTrigger className="h-8 text-xs">
               <SelectValue />
@@ -77,9 +79,11 @@ export function AccordionControls({
           <Label className="text-xs">Animation Type</Label>
           <Select
             value={accordion.animationType}
-            onValueChange={(value: "Fade" | "Slide" | "None") =>
-              updateAccordion({ animationType: value })
-            }
+            onValueChange={(value: "Fade" | "Slide" | "None" | null) => {
+              if (value) {
+                updateAccordion({ animationType: value });
+              }
+            }}
           >
             <SelectTrigger className="h-8 text-xs">
               <SelectValue />

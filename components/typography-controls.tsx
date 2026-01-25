@@ -64,9 +64,11 @@ export function TypographyControls({
                 <Label className="text-xs">Font Family</Label>
                 <Select
                   value={styles[element].fontFamily}
-                  onValueChange={(value) =>
-                    updateTypography(element, "fontFamily", value)
-                  }
+                  onValueChange={(value: string | null) => {
+                    if (value) {
+                      updateTypography(element, "fontFamily", value);
+                    }
+                  }}
                 >
                   <SelectTrigger className="h-8 text-xs">
                     <SelectValue />
@@ -84,9 +86,11 @@ export function TypographyControls({
                 <Label className="text-xs">Font Size</Label>
                 <Select
                   value={styles[element].fontSize}
-                  onValueChange={(value) =>
-                    updateTypography(element, "fontSize", value)
-                  }
+                  onValueChange={(value: string | null) => {
+                    if (value) {
+                      updateTypography(element, "fontSize", value);
+                    }
+                  }}
                 >
                   <SelectTrigger className="h-8 text-xs">
                     <SelectValue />
@@ -104,9 +108,11 @@ export function TypographyControls({
                 <Label className="text-xs">Font Weight</Label>
                 <Select
                   value={styles[element].fontWeight}
-                  onValueChange={(value) =>
-                    updateTypography(element, "fontWeight", value)
-                  }
+                  onValueChange={(value: string | null) => {
+                    if (value) {
+                      updateTypography(element, "fontWeight", value);
+                    }
+                  }}
                 >
                   <SelectTrigger className="h-8 text-xs">
                     <SelectValue />

@@ -1,4 +1,4 @@
-import { FAQConfig } from "./types";
+import { FAQConfig, FAQStyles, FAQContent } from "./types";
 
 // Legacy renderer - kept for backward compatibility
 // New code should use renderer-v2.tsx
@@ -44,7 +44,7 @@ export function renderFAQ(config: FAQConfig): { html: string; css: string } {
   return { html, css };
 }
 
-function generateCSS(styles: typeof import("./types").FAQStyles): string {
+function generateCSS(styles: FAQStyles): string {
   const {
     heading,
     description,
@@ -152,8 +152,8 @@ function generateCSS(styles: typeof import("./types").FAQStyles): string {
 }
 
 function generateHTML(
-  content: typeof import("./types").FAQContent,
-  styles: typeof import("./types").FAQStyles
+  content: FAQContent,
+  styles: FAQStyles
 ): string {
   const { heading, description, items } = content;
   const { accordion } = styles;
