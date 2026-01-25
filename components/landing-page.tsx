@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect } from "react";
-import { SignInButton, SignUpButton } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { IconArrowRight, IconCircleCheck, IconCode, IconBolt, IconShield, IconSearch, IconSparkles } from "@tabler/icons-react";
 
 export function LandingPage() {
+  const router = useRouter();
+  const { isSignedIn, isLoaded } = useUser();
   useEffect(() => {
     const structuredData = {
       "@context": "https://schema.org",
@@ -63,16 +66,22 @@ export function LandingPage() {
               <span className="text-lg font-semibold">FAQ Generator</span>
             </div>
             <div className="flex items-center gap-3">
-              <SignInButton mode="modal">
+              <SignInButton mode="modal" forceRedirectUrl="/editor">
                 <Button variant="ghost" size="sm">
                   Sign In
                 </Button>
               </SignInButton>
-              <SignUpButton mode="modal" forceRedirectUrl="/editor">
-                <Button size="sm">
+              {isLoaded && isSignedIn ? (
+                <Button size="sm" onClick={() => router.push("/editor")}>
                   Get Started
                 </Button>
-              </SignUpButton>
+              ) : (
+                <SignUpButton mode="modal" forceRedirectUrl="/editor">
+                  <Button size="sm">
+                    Get Started
+                  </Button>
+                </SignUpButton>
+              )}
             </div>
           </div>
         </div>
@@ -95,12 +104,19 @@ export function LandingPage() {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <SignUpButton mode="modal" forceRedirectUrl="/editor">
-                <Button size="lg" className="group">
+              {isLoaded && isSignedIn ? (
+                <Button size="lg" className="group" onClick={() => router.push("/editor")}>
                   Start Creating Free
                   <IconArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
-              </SignUpButton>
+              ) : (
+                <SignUpButton mode="modal" forceRedirectUrl="/editor">
+                  <Button size="lg" className="group">
+                    Start Creating Free
+                    <IconArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                </SignUpButton>
+              )}
               <Link href="/templates">
                 <Button size="lg" variant="outline">
                   View Templates
@@ -234,12 +250,19 @@ export function LandingPage() {
 
         {/* CTA in Benefits Section */}
         <div className="mt-16 text-center">
-          <SignUpButton mode="modal" forceRedirectUrl="/editor">
-            <Button size="lg" className="group">
+          {isLoaded && isSignedIn ? (
+            <Button size="lg" className="group" onClick={() => router.push("/editor")}>
               Start Building Your FAQs
               <IconArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
-          </SignUpButton>
+          ) : (
+            <SignUpButton mode="modal" forceRedirectUrl="/editor">
+              <Button size="lg" className="group">
+                Start Building Your FAQs
+                <IconArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </SignUpButton>
+          )}
         </div>
       </section>
 
@@ -255,12 +278,19 @@ export function LandingPage() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <SignUpButton mode="modal" forceRedirectUrl="/editor">
-              <Button size="lg" className="group">
+            {isLoaded && isSignedIn ? (
+              <Button size="lg" className="group" onClick={() => router.push("/editor")}>
                 Get Started Free
                 <IconArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
-            </SignUpButton>
+            ) : (
+              <SignUpButton mode="modal" forceRedirectUrl="/editor">
+                <Button size="lg" className="group">
+                  Get Started Free
+                  <IconArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </SignUpButton>
+            )}
             <Link href="/templates">
               <Button size="lg" variant="outline">
                 Explore Templates
@@ -282,7 +312,7 @@ export function LandingPage() {
               <Link href="/templates" className="hover:text-foreground transition-colors">
                 Templates
               </Link>
-              <SignInButton mode="modal">
+              <SignInButton mode="modal" forceRedirectUrl="/editor">
                 <button className="hover:text-foreground transition-colors">
                   Sign In
                 </button>
