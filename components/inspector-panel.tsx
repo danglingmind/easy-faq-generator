@@ -78,7 +78,7 @@ export function InspectorPanel({
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="min-w-[var(--radix-select-trigger-width)] w-[var(--radix-select-trigger-width)] max-w-[340px] [&_[data-slot=select-item-text]]:!whitespace-normal [&_[data-slot=select-item-text]]:!flex [&_[data-slot=select-item-text]]:!flex-col [&_[data-slot=select-item-text]]:!items-start [&_[data-slot=select-item-text]]:!w-full">
               {templates.map((template) => {
                 const requiresSignIn = template.id !== "default" && !isSignedIn;
                 const showLock = template.locked && !isPaid;
@@ -90,21 +90,21 @@ export function InspectorPanel({
                     key={template.id}
                     value={template.id}
                     disabled={isDisabled}
-                    className="py-3"
+                    className="py-3.5 px-3 pr-8 min-h-[76px]"
                   >
-                    <div className="flex w-full items-start justify-between gap-2">
-                      <div className="flex flex-col items-start gap-0.5 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-medium text-sm">{template.name}</span>
+                    <div className="flex w-full items-start gap-2 pr-2">
+                      <div className="flex flex-col items-start gap-1.5 flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 w-full">
+                          <span className="font-medium text-sm leading-tight">{template.name}</span>
                           {showLock && (
-                            <IconLock className="h-3.5 w-3.5 text-muted-foreground" />
+                            <IconLock className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
                           )}
                         </div>
-                        <span className="text-xs text-muted-foreground leading-tight">
+                        <span className="text-xs text-muted-foreground leading-relaxed break-words w-full">
                           {template.description}
                         </span>
                         {showLock && (
-                          <span className="text-xs text-amber-600 dark:text-amber-500 mt-0.5">
+                          <span className="text-xs text-amber-600 dark:text-amber-500 leading-tight mt-0.5">
                             Premium template - Upgrade to unlock
                           </span>
                         )}
