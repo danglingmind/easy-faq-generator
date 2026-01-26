@@ -58,46 +58,6 @@ export interface TemplateProtection {
   borderVisible?: boolean;
 }
 
-/**
- * Map CSS property names to TemplateProtection keys
- */
-const CSS_PROPERTY_MAP: Record<string, keyof TemplateProtection> = {
-  // Container
-  'background-color': 'backgroundColor',
-  'background': 'backgroundColor',
-  'padding': 'sectionPadding',
-  
-  // Typography (will be scoped by selector)
-  'font-family': 'fontFamily', // Will be prefixed with element name
-  'font-size': 'fontSize',
-  'font-weight': 'fontWeight',
-  'color': 'color',
-  
-  // Spacing
-  'margin-bottom': 'itemSpacing',
-  'padding-x': 'paddingX', // Special handling
-  'padding-y': 'paddingY',
-  'margin-x': 'marginX',
-  'margin-y': 'marginY',
-  
-  // Border
-  'border-color': 'borderColor',
-  'border-width': 'borderWidth',
-  'border-style': 'borderStyle',
-  'border': 'borderVisible',
-};
-
-/**
- * Map CSS selectors to element types
- */
-const SELECTOR_ELEMENT_MAP: Record<string, string> = {
-  '.faq-container': 'container',
-  '.faq-heading': 'heading',
-  '.faq-description': 'description',
-  '.faq-question': 'question',
-  '.faq-answer': 'answer',
-  '.faq-item': 'item',
-};
 
 /**
  * Parse @protect comments from CSS and extract protection flags

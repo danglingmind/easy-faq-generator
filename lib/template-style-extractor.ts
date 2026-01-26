@@ -148,15 +148,160 @@ function extractFontFamilyValue(css: string, selector: string): FAQStyles["headi
   if (!value) return null;
 
   const normalized = value.toLowerCase();
-  if (normalized.includes("inter")) return "Inter";
-  if (normalized.includes("roboto")) return "Roboto";
-  if (normalized.includes("open sans")) return "Open Sans";
-  if (normalized.includes("lato")) return "Lato";
-  if (normalized.includes("montserrat")) return "Montserrat";
-  if (normalized.includes("poppins")) return "Poppins";
-  if (normalized.includes("serif") || normalized.includes("georgia")) return "Serif";
-  if (normalized.includes("mono")) return "Mono";
-  if (normalized.includes("sans")) return "Sans";
+  
+  // Extract the first font name (before comma or quotes)
+  const firstFont = normalized.split(',')[0].trim().replace(/['"]/g, '').toLowerCase();
+  
+  // Font mapping - check specific fonts first, then generic
+  const fontMap: Record<string, FAQStyles["heading"]["fontFamily"]> = {
+    // System fonts
+    'system-ui': 'Default',
+    'apple-system': 'Default',
+    'georgia': 'Serif',
+    'monospace': 'Mono',
+    'sans-serif': 'Sans',
+    
+    // Popular Google Fonts - Sans Serif (check multi-word first)
+    'inter': 'Inter',
+    'open sans': 'Open Sans',
+    'source sans pro': 'Source Sans Pro',
+    'work sans': 'Work Sans',
+    'dm sans': 'DM Sans',
+    'noto sans': 'Noto Sans',
+    'pt sans': 'PT Sans',
+    'fira sans': 'Fira Sans',
+    'plus jakarta sans': 'Plus Jakarta Sans',
+    'space grotesk': 'Space Grotesk',
+    'red hat display': 'Red Hat Display',
+    'ibm plex sans': 'IBM Plex Sans',
+    'public sans': 'Public Sans',
+    'titillium web': 'Titillium Web',
+    'varela round': 'Varela Round',
+    'maven pro': 'Maven Pro',
+    'josefin sans': 'Josefin Sans',
+    'libre franklin': 'Libre Franklin',
+    'roboto': 'Roboto', // Check after roboto slab/mono
+    
+    // Serif fonts (check multi-word first)
+    'playfair display': 'Playfair Display',
+    'crimson text': 'Crimson Text',
+    'pt serif': 'PT Serif',
+    'source serif pro': 'Source Serif Pro',
+    'crimson pro': 'Crimson Pro',
+    'libre baskerville': 'Libre Baskerville',
+    'eb garamond': 'EB Garamond',
+    'noto serif': 'Noto Serif',
+    'roboto slab': 'Roboto Slab',
+    'zilla slab': 'Zilla Slab',
+    'bree serif': 'Bree Serif',
+    'crete round': 'Crete Round',
+    'cormorant garamond': 'Cormorant Garamond',
+    'gentium book basic': 'Gentium Book Basic',
+    'old standard tt': 'Old Standard TT',
+    'playfair display sc': 'Playfair Display SC',
+    'bodoni moda': 'Bodoni Moda',
+    'libre caslon display': 'Libre Caslon Display',
+    'yeseva one': 'Yeseva One',
+    
+    // Script/Handwriting fonts
+    'dancing script': 'Dancing Script',
+    'great vibes': 'Great Vibes',
+    'permanent marker': 'Permanent Marker',
+    'shadows into light': 'Shadows Into Light',
+    'amatic sc': 'Amatic SC',
+    
+    // Display fonts
+    'fredoka one': 'Fredoka One',
+    'bebas neue': 'Bebas Neue',
+    'fjalla one': 'Fjalla One',
+    'archivo black': 'Archivo Black',
+    'black ops one': 'Black Ops One',
+    'exo 2': 'Exo 2',
+    'russo one': 'Russo One',
+    'abril fatface': 'Abril Fatface',
+    'alfa slab one': 'Alfa Slab One',
+    'fugaz one': 'Fugaz One',
+    'luckiest guy': 'Luckiest Guy',
+    'passion one': 'Passion One',
+    'patua one': 'Patua One',
+    'titan one': 'Titan One',
+    
+    // Monospace fonts
+    'fira code': 'Fira Code',
+    'jetbrains mono': 'JetBrains Mono',
+    'source code pro': 'Source Code Pro',
+    'roboto mono': 'Roboto Mono',
+    'space mono': 'Space Mono',
+    'courier prime': 'Courier Prime',
+    'pt mono': 'PT Mono',
+    'overpass mono': 'Overpass Mono',
+    'anonymous pro': 'Anonymous Pro',
+    
+    // Single word fonts (check after multi-word)
+    'lato': 'Lato',
+    'montserrat': 'Montserrat',
+    'poppins': 'Poppins',
+    'nunito': 'Nunito',
+    'raleway': 'Raleway',
+    'ubuntu': 'Ubuntu',
+    'oswald': 'Oswald',
+    'cabin': 'Cabin',
+    'quicksand': 'Quicksand',
+    'dosis': 'Dosis',
+    'barlow': 'Barlow',
+    'rubik': 'Rubik',
+    'manrope': 'Manrope',
+    'outfit': 'Outfit',
+    'figtree': 'Figtree',
+    'sora': 'Sora',
+    'epilogue': 'Epilogue',
+    'lexend': 'Lexend',
+    'karla': 'Karla',
+    'hind': 'Hind',
+    'comfortaa': 'Comfortaa',
+    'merriweather': 'Merriweather',
+    'lora': 'Lora',
+    'bitter': 'Bitter',
+    'vollkorn': 'Vollkorn',
+    'alegreya': 'Alegreya',
+    'lusitana': 'Lusitana',
+    'spectral': 'Spectral',
+    'cinzel': 'Cinzel',
+    'prata': 'Prata',
+    'cormorant': 'Cormorant',
+    'fraunces': 'Fraunces',
+    'pacifico': 'Pacifico',
+    'satisfy': 'Satisfy',
+    'kalam': 'Kalam',
+    'caveat': 'Caveat',
+    'bangers': 'Bangers',
+    'righteous': 'Righteous',
+    'lobster': 'Lobster',
+    'anton': 'Anton',
+    'orbitron': 'Orbitron',
+    'rajdhani': 'Rajdhani',
+    'teko': 'Teko',
+    'bungee': 'Bungee',
+    'staatliches': 'Staatliches',
+    'inconsolata': 'Inconsolata',
+  };
+  
+  // Check exact match first
+  if (fontMap[firstFont]) {
+    return fontMap[firstFont];
+  }
+  
+  // Check if it contains any font name (for fallback)
+  for (const [key, font] of Object.entries(fontMap)) {
+    if (normalized.includes(key)) {
+      return font;
+    }
+  }
+  
+  // Generic fallbacks
+  if (normalized.includes('serif') && !normalized.includes('sans')) return 'Serif';
+  if (normalized.includes('mono')) return 'Mono';
+  if (normalized.includes('sans')) return 'Sans';
 
   return null;
 }
