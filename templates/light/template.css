@@ -1,0 +1,153 @@
+/* ================================
+   Container
+================================ */
+/* @protect: font-family */
+.faq-container {
+    background-color: #ffffff !important;
+    padding: 80px 72px !important;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif !important;
+  }
+  
+  /* ================================
+     Layout (Two Column)
+  ================================ */
+  .faq-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 72px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  @media (max-width: 600px) {
+    .faq-layout {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+  }
+  
+  /* ================================
+     Left Column
+  ================================ */
+  .faq-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  
+  /* ================================
+     Heading
+  ================================ */
+  /* @protect: font-weight */
+  .faq-heading {
+    font-size: 2.25rem !important; /* 4XL */
+    font-weight: 600 !important;
+    color: #111111 !important;
+    margin-bottom: 20px !important;
+  }
+  
+  /* ================================
+     Description
+  ================================ */
+  /* @protect: font-family, font-size, font-weight */
+  .faq-description {
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+    color: #555555 !important;
+    line-height: 1.6 !important;
+    max-width: 100% !important;
+  }
+  
+  .faq-description a {
+    color: #111111 !important;
+    text-decoration: underline !important;
+  }
+  
+  /* ================================
+     Right Column
+  ================================ */
+  .faq-right {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ================================
+     Items Wrapper
+  ================================ */
+  .faq-items {
+    max-width: 100% !important;
+  }
+  
+  /* ================================
+     Item
+  ================================ */
+  .faq-item {
+    margin-bottom: 20px !important;
+    overflow: hidden !important;
+  }
+  
+  /* ================================
+     Question
+  ================================ */
+  .faq-question {
+    width: 100% !important;
+    padding: 22px 0 !important;
+    background: transparent !important;
+    border: none !important;
+  
+    font-size: 1.125rem !important; /* LG */
+    font-weight: 500 !important;
+    color: #111111 !important;
+  
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    cursor: pointer !important;
+    text-align: left !important;
+  }
+  
+  .faq-question span:first-child {
+    padding-right: 24px !important;
+  }
+  
+  /* ================================
+     Icon
+  ================================ */
+  .faq-icon {
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 50% !important;
+    border: 1px solid #cccccc !important;
+  
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  
+    font-size: 1rem !important;
+    color: #666666 !important;
+  
+    transition: transform 200ms ease !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* Required state */
+  .faq-item[data-open="true"] .faq-icon {
+    transform: rotate(180deg);
+  }
+  
+  /* ================================
+     Answer
+  ================================ */
+  .faq-answer {
+    padding: 0 0 24px 0 !important;
+    font-size: 1rem !important; /* MD */
+    font-weight: 400 !important;
+    color: #444444 !important;
+    line-height: 1.65 !important;
+  }
+  
+  /* Required hidden state */
+  .faq-answer[hidden] {
+    display: none;
+  }

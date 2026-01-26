@@ -49,6 +49,14 @@ export const templates: Template[] = [
     locked: true,
     thumbnail: "/templates/botonical/thumbnail.png",
   },
+  {
+    id: "light",
+    name: "Light",
+    description: "Light and airy two-column layout",
+    preview: "light",
+    locked: true,
+    thumbnail: "/templates/light/thumbnail.png",
+  },
 ];
 
 export const defaultStyles = {
