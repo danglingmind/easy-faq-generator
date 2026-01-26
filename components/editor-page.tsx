@@ -183,7 +183,10 @@ export function EditorPage() {
     }
 
     // Premium templates still require paid tier.
-    if (template.locked && !isPaid) return;
+    if (template.locked && !isPaid) {
+      toast.error("This template requires a premium subscription. Upgrade to unlock all templates.");
+      return;
+    }
 
     setSelectedTemplate(templateId);
     

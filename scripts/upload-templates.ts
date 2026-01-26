@@ -21,7 +21,7 @@ config({ path: resolve(process.cwd(), ".env.local") });
 config({ path: resolve(process.cwd(), ".env") });
 
 import { uploadTemplate } from "../lib/r2";
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, existsSync, readdirSync, statSync } from "fs";
 import { join } from "path";
 
 const TEMPLATES_DIR = join(process.cwd(), "templates");
@@ -55,7 +55,20 @@ async function uploadTemplates() {
   console.log(`   Bucket: ${process.env.R2_BUCKET_NAME}`);
   console.log(`   Endpoint: ${process.env.R2_ENDPOINT || `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`}\n`);
 
-  const templates = ["default", "minimal", "card", "bordered", "split"];
+  // Automatically discover all templates in the templates directory
+  console.log("🔍 Discovering templates...");
+  const templateDirs = readdirSync(TEMPLATES_DIR).filter((item) => {
+    const itemPath = join(TEMPLATES_DIR, item);
+    return statSync(itemPath).isDirectory();
+  });
+
+  const templates = templateDirs.filter((templateId) => {
+    const htmlPath = join(TEMPLATES_DIR, templateId, "template.html");
+    const cssPath = join(TEMPLATES_DIR, templateId, "template.css");
+    return existsSync(htmlPath) && existsSync(cssPath);
+  });
+
+  console.log(`📦 Found ${templates.length} template(s): ${templates.join(", ")}\n`);
 
   for (const templateId of templates) {
     const templateDir = join(TEMPLATES_DIR, templateId);

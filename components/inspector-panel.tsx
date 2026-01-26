@@ -79,24 +79,40 @@ export function InspectorPanel({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {templates.map((template) => (
-                <SelectItem
-                  key={template.id}
-                  value={template.id}
-                  disabled={
-                    (template.id !== "default" && !isSignedIn) ||
-                    (template.locked && !isPaid)
-                  }
-                  className="py-3"
-                >
-                  <div className="flex flex-col items-start gap-0.5">
-                    <span className="font-medium text-sm">{template.name}</span>
-                    <span className="text-xs text-muted-foreground leading-tight">
-                      {template.description}
-                    </span>
-                  </div>
-                </SelectItem>
-              ))}
+              {templates.map((template) => {
+                const requiresSignIn = template.id !== "default" && !isSignedIn;
+                const showLock = template.locked && !isPaid;
+                // Only disable if requires sign-in (we'll handle locked templates with toast)
+                const isDisabled = requiresSignIn;
+                
+                return (
+                  <SelectItem
+                    key={template.id}
+                    value={template.id}
+                    disabled={isDisabled}
+                    className="py-3"
+                  >
+                    <div className="flex w-full items-start justify-between gap-2">
+                      <div className="flex flex-col items-start gap-0.5 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-medium text-sm">{template.name}</span>
+                          {showLock && (
+                            <IconLock className="h-3.5 w-3.5 text-muted-foreground" />
+                          )}
+                        </div>
+                        <span className="text-xs text-muted-foreground leading-tight">
+                          {template.description}
+                        </span>
+                        {showLock && (
+                          <span className="text-xs text-amber-600 dark:text-amber-500 mt-0.5">
+                            Premium template - Upgrade to unlock
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         </div>
