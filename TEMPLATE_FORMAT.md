@@ -97,6 +97,39 @@ Define these properties for proper style extraction:
 - `margin-bottom` - Spacing between items (will be extracted as `itemSpacing`)
 - `border` or `border-*` - Border styles (will be extracted for accordion border settings)
 
+**⚠️ Important: Border Property Guidelines**
+
+If you want borders to be **editable by users** in the editor:
+- **DO NOT** use the shorthand `border` property (e.g., `border: 1px solid #color;`)
+- **DO** omit border properties entirely from template CSS, or use individual border sides only if needed
+- The dynamic CSS system generates individual border sides (`border-top`, `border-right`, etc.) with `!important`
+- The shorthand `border` property can conflict with the dynamic CSS, preventing borders from being properly removed when disabled
+
+**Example - Editable Borders:**
+```css
+/* ✅ Good - No border in template, fully controlled by dynamic CSS */
+.faq-item {
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+/* ❌ Bad - Shorthand border prevents dynamic CSS from removing it */
+.faq-item {
+  border: 1px solid #dddddd; /* This will persist even when borders are disabled */
+  margin-bottom: 20px;
+}
+```
+
+**If you need a default border that should be protected:**
+```css
+/* ✅ Good - Use @protect to mark border as non-editable */
+/* @protect: border-color, border-width, border-style */
+.faq-item {
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  margin-bottom: 20px;
+}
+```
+
 #### 3. Required States
 
 Always include these state selectors:
@@ -542,6 +575,7 @@ Add a `/* @protect: property1, property2 */` comment directly before a CSS selec
 4. **Document custom features** - If using custom selectors, document them
 5. **Responsive design** - Include media queries for mobile devices
 6. **Accessibility** - Ensure proper contrast ratios and ARIA attributes (handled automatically)
+7. **Border properties** - Avoid using the shorthand `border` property on `.faq-item` if you want borders to be editable. The dynamic CSS system uses individual border sides (`border-top`, `border-right`, etc.) and the shorthand can conflict. Omit border properties from template CSS for fully editable borders, or use `@protect` if borders should be fixed.
 
 ## Migration Guide
 
