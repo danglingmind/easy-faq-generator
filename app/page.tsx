@@ -2,11 +2,16 @@ import { LandingPage } from "@/components/landing-page";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Easy FAQ Generator - Create SEO-Optimized FAQ Sections | Free FAQ Embed Builder",
-  description: "Generate beautiful, SEO-optimized FAQ sections for your website. Create custom FAQ embeds with structured data, improve search rankings, and enhance user experience. Free to start, no coding required.",
+  title: "FAQ Generator Tool - No Code Platform for FAQ Creator | Easy FAQ Generator",
+  description: "The best FAQ generator tool and no code platform for creating beautiful FAQ sections. Use our FAQ creator tool to build SEO-optimized FAQ embeds with structured data. No coding required - get started today.",
   keywords: [
-    "Easy FAQ Generator",
+    "no code platform",
+    "faq creator tool",
+    "faq generator tool",
+    "FAQ generator",
     "FAQ builder",
+    "FAQ creator",
+    "no code FAQ builder",
     "FAQ embed",
     "SEO FAQ",
     "FAQ section builder",
@@ -24,18 +29,19 @@ export const metadata: Metadata = {
     "FAQ JavaScript",
     "FAQ embed script",
     "FAQ section creator",
-    "FAQ page builder"
+    "FAQ page builder",
+    "no code solution"
   ],
   openGraph: {
-    title: "Easy FAQ Generator - Create SEO-Optimized FAQ Sections",
-    description: "Generate beautiful, SEO-optimized FAQ sections for your website. Create custom FAQ embeds with structured data, improve search rankings, and enhance user experience.",
+    title: "FAQ Generator Tool - No Code Platform for FAQ Creator",
+    description: "The best FAQ generator tool and no code platform for creating beautiful FAQ sections. Use our FAQ creator tool to build SEO-optimized FAQ embeds with structured data. No coding required.",
     type: "website",
     url: process.env.NEXT_PUBLIC_APP_URL || "https://faq-generator.com",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Easy FAQ Generator - Create SEO-Optimized FAQ Sections",
-    description: "Generate beautiful, SEO-optimized FAQ sections for your website. Free to start, no coding required.",
+    title: "FAQ Generator Tool - No Code Platform for FAQ Creator",
+    description: "The best FAQ generator tool and no code platform for creating beautiful FAQ sections. No coding required - get started today.",
   },
   alternates: {
     canonical: process.env.NEXT_PUBLIC_APP_URL || "https://faq-generator.com",
