@@ -77,6 +77,7 @@ export interface Template {
   description: string;
   preview: string;
   locked: boolean;
+  thumbnail?: string;
 }
 
 export interface FAQConfig {

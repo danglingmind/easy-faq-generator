@@ -7,6 +7,7 @@ export const templates: Template[] = [
     description: "Clean and simple accordion layout",
     preview: "default",
     locked: false,
+    thumbnail: "/templates/default/thumbnail.png",
   },
   {
     id: "minimal",
@@ -14,6 +15,7 @@ export const templates: Template[] = [
     description: "Minimalist design with subtle borders",
     preview: "minimal",
     locked: true,
+    thumbnail: "/templates/minimal/thumbnail.png",
   },
   {
     id: "card",
@@ -21,6 +23,7 @@ export const templates: Template[] = [
     description: "Card-based layout with shadows",
     preview: "card",
     locked: true,
+    thumbnail: "/templates/card/thumbnail.png",
   },
   {
     id: "bordered",
@@ -28,6 +31,7 @@ export const templates: Template[] = [
     description: "Strong borders and clear separation",
     preview: "bordered",
     locked: true,
+    thumbnail: "/templates/bordered/thumbnail.png",
   },
   {
     id: "split",
@@ -35,6 +39,7 @@ export const templates: Template[] = [
     description: "Two-column layout with dark green background",
     preview: "split",
     locked: true,
+    thumbnail: "/templates/split/thumbnail.png",
   },
 ];
 
