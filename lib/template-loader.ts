@@ -1,6 +1,7 @@
 import { FAQContent, FAQStyles } from "./types";
 import { TemplateFile } from "./r2";
 import { generateDynamicCSS } from "./template-styles";
+import { parseTemplateProtection } from "./template-protection";
 
 /**
  * Placeholder markers in templates
@@ -84,10 +85,13 @@ export function buildCombinedCSS(
   styles: FAQStyles,
   templateId?: string
 ): string {
+  // Parse protection from template CSS
+  const protection = parseTemplateProtection(template.css);
+  
   // Generate dynamic CSS from styles object and merge with template CSS
   // Dynamic CSS comes AFTER template CSS so user customizations override template defaults
-  // Pass template CSS to detect if template should be protected from overrides
-  const dynamicCSS = generateDynamicCSS(styles, templateId, template.css);
+  // Pass protection to control which properties are editable
+  const dynamicCSS = generateDynamicCSS(styles, templateId, template.css, protection);
   return `/* Template Base Styles */\n${template.css}\n\n/* User Customizations */\n${dynamicCSS}`;
 }
 

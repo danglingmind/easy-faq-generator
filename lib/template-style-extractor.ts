@@ -1,5 +1,6 @@
 import { FAQStyles } from "./types";
 import { defaultStyles } from "./templates";
+import { parseTemplateProtection, TemplateProtection } from "./template-protection";
 
 /**
  * Extract CSS property value from CSS string
@@ -423,6 +424,42 @@ export async function extractTemplateStyles(templateId: string): Promise<FAQStyl
     return templateStyles;
   } catch (error) {
     console.error("Error extracting template styles:", error);
+    return null;
+  }
+}
+
+/**
+ * Extract both styles and protection info from template CSS
+ */
+export async function extractTemplateStylesAndProtection(
+  templateId: string
+): Promise<{ styles: FAQStyles; protection: TemplateProtection } | null> {
+  try {
+    // Fetch template from API
+    const response = await fetch(`/api/templates/${templateId}`);
+    if (!response.ok) {
+      return null;
+    }
+
+    const template = await response.json();
+    const css = template.css || "";
+
+    if (!css) {
+      return null;
+    }
+
+    // Extract styles
+    const styles = await extractTemplateStyles(templateId);
+    if (!styles) {
+      return null;
+    }
+
+    // Extract protection
+    const protection = parseTemplateProtection(css);
+
+    return { styles, protection };
+  } catch (error) {
+    console.error("Error extracting template styles and protection:", error);
     return null;
   }
 }

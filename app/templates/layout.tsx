@@ -95,6 +95,12 @@ export default function TemplatesLayout({
                   name: "Split FAQ Template",
                   description: "Two-column layout with dark green background",
                 },
+                {
+                  "@type": "ListItem",
+                  position: 6,
+                  name: "Botonical FAQ Template",
+                  description: "Botanical-inspired design with natural aesthetics",
+                },
               ],
             },
           }),

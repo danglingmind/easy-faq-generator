@@ -26,7 +26,7 @@ export function EditorPage() {
       heading: "Frequently Asked Questions",
       description: "Find answers to common questions about our product.",
       items: [
-        { id: "1", question: "What is this?", answer: "This is a FAQ generator." },
+        { id: "1", question: "What is this?", answer: "This is Easy FAQ Generator." },
       ],
     }
   );

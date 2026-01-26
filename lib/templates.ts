@@ -41,6 +41,14 @@ export const templates: Template[] = [
     locked: true,
     thumbnail: "/templates/split/thumbnail.png",
   },
+  {
+    id: "botonical",
+    name: "Botonical",
+    description: "Botanical-inspired design with natural aesthetics",
+    preview: "botonical",
+    locked: true,
+    thumbnail: "/templates/botonical/thumbnail.png",
+  },
 ];
 
 export const defaultStyles = {

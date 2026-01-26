@@ -130,119 +130,123 @@ export function AccordionControls({
             </label>
           </div>
 
-          {accordion.borderVisible && (
-            <>
-              <div>
-                <Label className="text-xs">Border Color</Label>
-                <div className="mt-1 flex gap-2">
-                  <Input
-                    type="color"
-                    value={accordion.borderColor}
-                    onChange={(e) =>
-                      updateAccordion({ borderColor: e.target.value })
-                    }
-                    className="h-8 w-16 p-1"
-                  />
-                  <Input
-                    type="text"
-                    value={accordion.borderColor}
-                    onChange={(e) =>
-                      updateAccordion({ borderColor: e.target.value })
-                    }
-                    className="h-8 flex-1 text-xs"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label className="text-xs">Border Width</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  max="10"
-                  value={accordion.borderWidth ?? 1}
-                  onChange={(e) => {
-                    const value = parseInt(e.target.value);
-                    updateAccordion({
-                      borderWidth: isNaN(value) ? 1 : Math.max(0, Math.min(10, value)),
-                    });
-                  }}
-                  className="mt-1 h-8 text-xs"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Border Style</Label>
-                <Select
-                  value={accordion.borderStyle}
-                  onValueChange={(value: any) =>
-                    updateAccordion({ borderStyle: value })
+          <div>
+            <Label className="text-xs">Border Color</Label>
+            <div className="mt-1 flex gap-2">
+              <Input
+                type="color"
+                value={accordion.borderColor}
+                onChange={(e) =>
+                  updateAccordion({ borderColor: e.target.value })
+                }
+                disabled={!accordion.borderVisible}
+                className="h-8 w-16 p-1"
+              />
+              <Input
+                type="text"
+                value={accordion.borderColor}
+                onChange={(e) =>
+                  updateAccordion({ borderColor: e.target.value })
+                }
+                disabled={!accordion.borderVisible}
+                className="h-8 flex-1 text-xs"
+              />
+            </div>
+          </div>
+          <div>
+            <Label className="text-xs">Border Width</Label>
+            <Input
+              type="number"
+              min="0"
+              max="10"
+              value={accordion.borderWidth ?? 1}
+              onChange={(e) => {
+                const value = parseInt(e.target.value);
+                updateAccordion({
+                  borderWidth: isNaN(value) ? 1 : Math.max(0, Math.min(10, value)),
+                });
+              }}
+              disabled={!accordion.borderVisible}
+              className="mt-1 h-8 text-xs"
+            />
+          </div>
+          <div>
+            <Label className="text-xs">Border Style</Label>
+            <Select
+              value={accordion.borderStyle}
+              onValueChange={(value: any) =>
+                updateAccordion({ borderStyle: value })
+              }
+              disabled={!accordion.borderVisible}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="solid">Solid</SelectItem>
+                <SelectItem value="dashed">Dashed</SelectItem>
+                <SelectItem value="dotted">Dotted</SelectItem>
+                <SelectItem value="double">Double</SelectItem>
+                <SelectItem value="groove">Groove</SelectItem>
+                <SelectItem value="ridge">Ridge</SelectItem>
+                <SelectItem value="inset">Inset</SelectItem>
+                <SelectItem value="outset">Outset</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs mb-2 block">Border Sides</Label>
+            <div className="grid grid-cols-2 gap-2">
+              <label className={`flex items-center gap-2 ${accordion.borderVisible ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}>
+                <input
+                  type="checkbox"
+                  checked={accordion.borderSides.top}
+                  onChange={(e) =>
+                    updateBorderSides("top", e.target.checked)
                   }
-                >
-                  <SelectTrigger className="h-8 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="solid">Solid</SelectItem>
-                    <SelectItem value="dashed">Dashed</SelectItem>
-                    <SelectItem value="dotted">Dotted</SelectItem>
-                    <SelectItem value="double">Double</SelectItem>
-                    <SelectItem value="groove">Groove</SelectItem>
-                    <SelectItem value="ridge">Ridge</SelectItem>
-                    <SelectItem value="inset">Inset</SelectItem>
-                    <SelectItem value="outset">Outset</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-xs mb-2 block">Border Sides</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={accordion.borderSides.top}
-                      onChange={(e) =>
-                        updateBorderSides("top", e.target.checked)
-                      }
-                      className="h-4 w-4 rounded border-gray-300"
-                    />
-                    <span className="text-xs">Top</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={accordion.borderSides.right}
-                      onChange={(e) =>
-                        updateBorderSides("right", e.target.checked)
-                      }
-                      className="h-4 w-4 rounded border-gray-300"
-                    />
-                    <span className="text-xs">Right</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={accordion.borderSides.bottom}
-                      onChange={(e) =>
-                        updateBorderSides("bottom", e.target.checked)
-                      }
-                      className="h-4 w-4 rounded border-gray-300"
-                    />
-                    <span className="text-xs">Bottom</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={accordion.borderSides.left}
-                      onChange={(e) =>
-                        updateBorderSides("left", e.target.checked)
-                      }
-                      className="h-4 w-4 rounded border-gray-300"
-                    />
-                    <span className="text-xs">Left</span>
-                  </label>
-                </div>
-              </div>
-            </>
-          )}
+                  disabled={!accordion.borderVisible}
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+                <span className="text-xs">Top</span>
+              </label>
+              <label className={`flex items-center gap-2 ${accordion.borderVisible ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}>
+                <input
+                  type="checkbox"
+                  checked={accordion.borderSides.right}
+                  onChange={(e) =>
+                    updateBorderSides("right", e.target.checked)
+                  }
+                  disabled={!accordion.borderVisible}
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+                <span className="text-xs">Right</span>
+              </label>
+              <label className={`flex items-center gap-2 ${accordion.borderVisible ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}>
+                <input
+                  type="checkbox"
+                  checked={accordion.borderSides.bottom}
+                  onChange={(e) =>
+                    updateBorderSides("bottom", e.target.checked)
+                  }
+                  disabled={!accordion.borderVisible}
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+                <span className="text-xs">Bottom</span>
+              </label>
+              <label className={`flex items-center gap-2 ${accordion.borderVisible ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}>
+                <input
+                  type="checkbox"
+                  checked={accordion.borderSides.left}
+                  onChange={(e) =>
+                    updateBorderSides("left", e.target.checked)
+                  }
+                  disabled={!accordion.borderVisible}
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+                <span className="text-xs">Left</span>
+              </label>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-2">

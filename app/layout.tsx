@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FAQ Embed Generator",
+  title: "Easy FAQ Generator",
   description: "Generate SEO-optimized FAQ sections for your website",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
 };

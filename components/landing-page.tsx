@@ -16,7 +16,7 @@ export function LandingPage() {
     const structuredData = {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      "name": "FAQ Generator",
+      "name": "Easy FAQ Generator",
       "applicationCategory": "WebApplication",
       "description": "Generate beautiful, SEO-optimized FAQ sections for your website. Create custom FAQ embeds with structured data, improve search rankings, and enhance user experience.",
       "url": typeof window !== 'undefined' ? window.location.origin : "https://faq-generator.com",
@@ -64,7 +64,7 @@ export function LandingPage() {
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-2">
               <IconSparkles className="h-6 w-6 text-primary" />
-              <span className="text-lg font-semibold">FAQ Generator</span>
+              <span className="text-lg font-semibold">Easy FAQ Generator</span>
             </div>
             <div className="flex items-center gap-3">
               <SignInButton mode="modal" forceRedirectUrl="/editor">
@@ -265,7 +265,7 @@ export function LandingPage() {
               Ready to Boost Your SEO Rankings?
             </h2>
             <p className="text-xl text-muted-foreground">
-              Join thousands of websites using our FAQ generator to improve their search visibility and user experience.
+              Join thousands of websites using Easy FAQ Generator to improve their search visibility and user experience.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -297,7 +297,7 @@ export function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-muted-foreground">
               <IconSparkles className="h-5 w-5" />
-              <span className="text-sm">FAQ Generator</span>
+              <span className="text-sm">Easy FAQ Generator</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
               <Link href="/templates" className="hover:text-foreground transition-colors">

@@ -203,6 +203,44 @@ Always include these state selectors:
 /* ... rest of styles with !important ... */
 ```
 
+```css
+/* Protected template using @protect directive (recommended) */
+/* @protect: background */
+.faq-container {
+  background: radial-gradient(
+    circle at top,
+    rgba(255, 255, 255, 0.06),
+    rgba(0, 0, 0, 0.85)
+  ),
+  url("https://example.com/bg.jpg") center/cover no-repeat !important;
+  padding: 72px 64px !important; /* Users can edit padding */
+}
+
+/* @protect: font-family, font-size, font-weight, color */
+.faq-heading {
+  font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+  font-size: 2.25rem !important;
+  font-weight: 500 !important;
+  color: #ffffff !important;
+  text-align: center !important;
+  margin-bottom: 48px !important; /* Users can edit margin */
+}
+
+/* @protect: color */
+.faq-question {
+  color: #ffffff !important;
+  padding: 22px 26px !important; /* Users can edit padding */
+  font-size: 1.125rem !important; /* Users can edit font size */
+}
+
+/* @protect: border-color, border-style */
+.faq-item {
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 14px !important;
+  margin-bottom: 20px !important; /* Users can edit spacing */
+}
+```
+
 ## HTML Format Standard
 
 ### Required Structure
@@ -350,6 +388,8 @@ The system automatically extracts styles from your template CSS using these sele
 
 ## Template Protection
 
+### Automatic Protection (Legacy)
+
 Templates are automatically protected from user customizations if:
 
 - The template CSS contains more than 3 `!important` declarations
@@ -359,6 +399,140 @@ Protected templates will:
 - ✅ Have their base styles preserved
 - ✅ Still allow some user customizations (spacing, borders, animations)
 - ❌ Prevent overriding of colors, fonts, and sizes
+
+### Granular Property Protection (Recommended)
+
+You can now mark specific properties as protected using CSS comments with the `@protect` directive. This gives you fine-grained control over which properties users can edit.
+
+#### Syntax
+
+Add a `/* @protect: property1, property2 */` comment directly before a CSS selector:
+
+```css
+/* @protect: background-color */
+.faq-container {
+  background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%) !important;
+  padding: 32px !important; /* This is still editable */
+}
+
+/* @protect: font-family, font-size, font-weight, color */
+.faq-heading {
+  font-family: "Inter", sans-serif !important;
+  font-size: 2.5rem !important;
+  font-weight: 700 !important;
+  color: #1a1a1a !important;
+}
+```
+
+#### Supported Properties
+
+**Container (`.faq-container`):**
+- `background` or `background-color` → Protects container background
+- `padding` → Protects section padding
+
+**Heading (`.faq-heading`):**
+- `font-family` → Protects heading font family
+- `font-size` → Protects heading font size
+- `font-weight` → Protects heading font weight
+- `color` → Protects heading text color
+
+**Description (`.faq-description`):**
+- `font-family` → Protects description font family
+- `font-size` → Protects description font size
+- `font-weight` → Protects description font weight
+- `color` → Protects description text color
+
+**Question (`.faq-question`):**
+- `font-family` → Protects question font family
+- `font-size` → Protects question font size
+- `font-weight` → Protects question font weight
+- `color` → Protects question text color
+- `padding` or `padding-x` → Protects horizontal padding
+- `padding-y` → Protects vertical padding
+- `margin` or `margin-x` → Protects horizontal margin
+- `margin-y` → Protects vertical margin
+
+**Answer (`.faq-answer`):**
+- `font-family` → Protects answer font family
+- `font-size` → Protects answer font size
+- `font-weight` → Protects answer font weight
+- `color` → Protects answer text color
+- `padding` or `padding-x` → Protects horizontal padding
+- `padding-y` → Protects vertical padding
+- `margin` or `margin-x` → Protects horizontal margin
+- `margin-y` → Protects vertical margin
+
+**Item (`.faq-item`):**
+- `margin-bottom` or `spacing` → Protects item spacing
+- `border-color` → Protects border color
+- `border-width` → Protects border width
+- `border-style` → Protects border style
+- `border` → Protects border visibility
+
+#### Example: Protected Template
+
+```css
+/* Protect container background but allow padding changes */
+/* @protect: background */
+.faq-container {
+  background: radial-gradient(
+    circle at top,
+    rgba(255, 255, 255, 0.06),
+    rgba(0, 0, 0, 0.85)
+  ),
+  url("https://example.com/bg.jpg") center/cover no-repeat !important;
+  padding: 72px 64px !important; /* Users can still edit this */
+}
+
+/* Protect all heading typography */
+/* @protect: font-family, font-size, font-weight, color */
+.faq-heading {
+  font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+  font-size: 2.25rem !important;
+  font-weight: 500 !important;
+  color: #ffffff !important;
+  text-align: center !important;
+  margin-bottom: 48px !important; /* Users can still edit this */
+}
+
+/* Protect question color but allow padding/margin changes */
+/* @protect: color */
+.faq-question {
+  color: #ffffff !important;
+  padding: 22px 26px !important; /* Users can edit this */
+  margin: 0 !important; /* Users can edit this */
+  font-size: 1.125rem !important; /* Users can edit this */
+}
+
+/* Protect border color and style but allow width changes */
+/* @protect: border-color, border-style */
+.faq-item {
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 14px !important;
+  margin-bottom: 20px !important; /* Users can edit spacing */
+}
+```
+
+#### How It Works
+
+1. **Parser**: The system parses `@protect` comments from your template CSS
+2. **Protection Map**: Creates a protection object marking which properties are protected
+3. **CSS Generation**: Skips generating CSS for protected properties (they won't be overridden)
+4. **Editor UI**: Disables input controls for protected properties (users can't edit them)
+
+#### Benefits
+
+- ✅ **Fine-grained control**: Protect only the properties you need
+- ✅ **Better UX**: Users see disabled controls instead of changes not taking effect
+- ✅ **Flexible**: Mix protected and editable properties as needed
+- ✅ **Backward compatible**: Works alongside the automatic `!important` detection
+
+#### Best Practices
+
+1. **Protect brand identity**: Use `@protect` for colors, fonts, and sizes that define your template's identity
+2. **Allow layout flexibility**: Don't protect spacing properties unless necessary
+3. **Document intent**: Add comments explaining why properties are protected
+4. **Test in editor**: Verify that protected properties are disabled in the editor UI
 
 ## Best Practices
 

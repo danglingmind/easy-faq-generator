@@ -1,4 +1,5 @@
 import { FAQStyles } from "./types";
+import { TemplateProtection, isPropertyProtected } from "./template-protection";
 
 const fontFamilyMap: Record<string, string> = {
   Default: "system-ui, -apple-system, sans-serif",
@@ -62,14 +63,17 @@ function isTemplateProtected(templateCSS?: string): boolean {
  * Generate dynamic CSS from styles object
  * This applies user customizations to the template
  * 
- * Templates using !important (see TEMPLATE_FORMAT.md) are automatically protected
- * from user customizations to preserve their visual identity.
- * 
  * @param styles - The styles object
  * @param templateId - Optional template ID for higher specificity selectors
- * @param templateCSS - Optional template CSS to detect if template should be protected
+ * @param templateCSS - Optional template CSS (for backward compatibility)
+ * @param protection - Optional protection object to control which properties are editable
  */
-export function generateDynamicCSS(styles: FAQStyles, templateId?: string, templateCSS?: string): string {
+export function generateDynamicCSS(
+  styles: FAQStyles, 
+  templateId?: string, 
+  templateCSS?: string,
+  protection?: TemplateProtection | null
+): string {
   const {
     heading,
     description,
@@ -97,8 +101,13 @@ export function generateDynamicCSS(styles: FAQStyles, templateId?: string, templ
           .join("&")}&display=swap");\n`
       : "";
   
-  // Automatically detect if template should be protected based on its CSS
-  const isTemplateControlled = isTemplateProtected(templateCSS);
+  // Use protection if provided, otherwise fall back to old detection method for backward compatibility
+  const isTemplateControlled = protection 
+    ? Object.values(protection).some(v => v === true) // If any property is protected, use old behavior as fallback
+    : isTemplateProtected(templateCSS);
+  
+  // Helper to check if a property is protected
+  const isProtected = (path: string) => protection ? isPropertyProtected(protection, path) : false;
 
   // Defensive check for borderSides - ensure it exists and has all properties
   const borderSides = accordion.borderSides || {
@@ -116,75 +125,85 @@ export function generateDynamicCSS(styles: FAQStyles, templateId?: string, templ
 
   return `
     ${googleFontsImport}
-    .faq-container {
-      ${!isTemplateControlled ? `background: ${bg} !important;` : ''}
-      padding: ${spacing.sectionPadding}px !important;
+    /* Use higher specificity selector for templates that use data-template attribute */
+    /* Use higher specificity selector for templates that use data-template attribute */
+    ${templateId ? `.faq-container[data-template="${templateId}"]` : '.faq-container'} {
+      ${!isProtected('backgroundColor') ? `background: ${bg} !important;` : ''}
+      ${!isProtected('spacing.sectionPadding') ? `padding: ${spacing.sectionPadding}px !important;` : ''}
       font-family: ${fontFamilyMap[heading.fontFamily] || fontFamilyMap.Default} !important;
     }
-    .faq-heading {
-      ${!isTemplateControlled ? `font-family: ${fontFamilyMap[heading.fontFamily] || fontFamilyMap.Default} !important;` : ''}
-      ${!isTemplateControlled ? `font-size: ${fontSizeMap[heading.fontSize]} !important;` : ''}
-      ${!isTemplateControlled ? `font-weight: ${fontWeightMap[heading.fontWeight]} !important;` : ''}
-      ${!isTemplateControlled ? `color: ${heading.color} !important;` : ''}
+    ${templateId ? `.faq-container[data-template="${templateId}"] .faq-heading` : '.faq-heading'} {
+      ${!isProtected('heading.fontFamily') ? `font-family: ${fontFamilyMap[heading.fontFamily] || fontFamilyMap.Default} !important;` : ''}
+      ${!isProtected('heading.fontSize') ? `font-size: ${fontSizeMap[heading.fontSize]} !important;` : ''}
+      ${!isProtected('heading.fontWeight') ? `font-weight: ${fontWeightMap[heading.fontWeight]} !important;` : ''}
+      ${!isProtected('heading.color') ? `color: ${heading.color} !important;` : ''}
     }
-    .faq-description {
-      ${!isTemplateControlled ? `font-family: ${fontFamilyMap[description.fontFamily] || fontFamilyMap.Default} !important;` : ''}
-      ${!isTemplateControlled ? `font-size: ${fontSizeMap[description.fontSize]} !important;` : ''}
-      ${!isTemplateControlled ? `font-weight: ${fontWeightMap[description.fontWeight]} !important;` : ''}
-      ${!isTemplateControlled ? `color: ${description.color} !important;` : ''}
+    ${templateId ? `.faq-container[data-template="${templateId}"] .faq-description` : '.faq-description'} {
+      ${!isProtected('description.fontFamily') ? `font-family: ${fontFamilyMap[description.fontFamily] || fontFamilyMap.Default} !important;` : ''}
+      ${!isProtected('description.fontSize') ? `font-size: ${fontSizeMap[description.fontSize]} !important;` : ''}
+      ${!isProtected('description.fontWeight') ? `font-weight: ${fontWeightMap[description.fontWeight]} !important;` : ''}
+      ${!isProtected('description.color') ? `color: ${description.color} !important;` : ''}
     }
     /* Use higher specificity selector for templates that use data-template attribute */
     ${templateId ? `.faq-container[data-template="${templateId}"] .faq-item` : '.faq-item'} {
-      margin-bottom: ${spacing.itemSpacing}px !important;
+      ${!isProtected('spacing.itemSpacing') ? `margin-bottom: ${spacing.itemSpacing}px !important;` : ''}
       ${
-        borderVisible
+        borderVisible && !isProtected('accordion.borderVisible')
           ? `
         /* Explicitly set each border side individually for proper control */
         ${
-          borderSides.top
+          borderSides.top && !isProtected('accordion.borderColor') && !isProtected('accordion.borderWidth') && !isProtected('accordion.borderStyle')
             ? `border-top: ${borderWidth}px ${borderStyle} ${borderColor} !important;`
-            : "border-top: none !important;"
+            : borderSides.top ? "border-top: none !important;" : ""
         }
         ${
-          borderSides.right
+          borderSides.right && !isProtected('accordion.borderColor') && !isProtected('accordion.borderWidth') && !isProtected('accordion.borderStyle')
             ? `border-right: ${borderWidth}px ${borderStyle} ${borderColor} !important;`
-            : "border-right: none !important;"
+            : borderSides.right ? "border-right: none !important;" : ""
         }
         ${
-          borderSides.bottom
+          borderSides.bottom && !isProtected('accordion.borderColor') && !isProtected('accordion.borderWidth') && !isProtected('accordion.borderStyle')
             ? `border-bottom: ${borderWidth}px ${borderStyle} ${borderColor} !important;`
-            : "border-bottom: none !important;"
+            : borderSides.bottom ? "border-bottom: none !important;" : ""
         }
         ${
-          borderSides.left
+          borderSides.left && !isProtected('accordion.borderColor') && !isProtected('accordion.borderWidth') && !isProtected('accordion.borderStyle')
             ? `border-left: ${borderWidth}px ${borderStyle} ${borderColor} !important;`
-            : "border-left: none !important;"
+            : borderSides.left ? "border-left: none !important;" : ""
         }
       `
-          : `
+          : !isProtected('accordion.borderVisible') ? `
         border-top: none !important;
         border-right: none !important;
         border-bottom: none !important;
         border-left: none !important;
-      `
+      ` : ''
       }
     }
     /* Use higher specificity selector for templates that use data-template attribute */
     ${templateId ? `.faq-container[data-template="${templateId}"] .faq-question` : '.faq-question'} {
-      ${!isTemplateControlled ? `font-family: ${fontFamilyMap[question.fontFamily] || fontFamilyMap.Default} !important;` : ''}
-      ${!isTemplateControlled ? `font-size: ${fontSizeMap[question.fontSize]} !important;` : ''}
-      ${!isTemplateControlled ? `font-weight: ${fontWeightMap[question.fontWeight]} !important;` : ''}
-      ${!isTemplateControlled ? `color: ${question.color} !important;` : ''}
-      ${!isTemplateControlled ? `padding: ${accordion.paddingY}px ${accordion.paddingX}px !important;` : ''}
-      ${!isTemplateControlled ? `margin: ${accordion.marginY}px ${accordion.marginX}px !important;` : ''}
+      ${!isProtected('question.fontFamily') ? `font-family: ${fontFamilyMap[question.fontFamily] || fontFamilyMap.Default} !important;` : ''}
+      ${!isProtected('question.fontSize') ? `font-size: ${fontSizeMap[question.fontSize]} !important;` : ''}
+      ${!isProtected('question.fontWeight') ? `font-weight: ${fontWeightMap[question.fontWeight]} !important;` : ''}
+      ${!isProtected('question.color') ? `color: ${question.color} !important;` : ''}
+      ${!isProtected('accordion.paddingX') && !isProtected('accordion.paddingY') ? `padding: ${accordion.paddingY}px ${accordion.paddingX}px !important;` : 
+        !isProtected('accordion.paddingX') && isProtected('accordion.paddingY') ? `padding-left: ${accordion.paddingX}px !important; padding-right: ${accordion.paddingX}px !important;` :
+        isProtected('accordion.paddingX') && !isProtected('accordion.paddingY') ? `padding-top: ${accordion.paddingY}px !important; padding-bottom: ${accordion.paddingY}px !important;` : ''}
+      ${!isProtected('accordion.marginX') && !isProtected('accordion.marginY') ? `margin: ${accordion.marginY}px ${accordion.marginX}px !important;` : 
+        !isProtected('accordion.marginX') && isProtected('accordion.marginY') ? `margin-left: ${accordion.marginX}px !important; margin-right: ${accordion.marginX}px !important;` :
+        isProtected('accordion.marginX') && !isProtected('accordion.marginY') ? `margin-top: ${accordion.marginY}px !important; margin-bottom: ${accordion.marginY}px !important;` : ''}
     }
     ${templateId ? `.faq-container[data-template="${templateId}"] .faq-answer` : '.faq-answer'} {
-      ${!isTemplateControlled ? `font-family: ${fontFamilyMap[answer.fontFamily] || fontFamilyMap.Default} !important;` : ''}
-      ${!isTemplateControlled ? `font-size: ${fontSizeMap[answer.fontSize]} !important;` : ''}
-      ${!isTemplateControlled ? `font-weight: ${fontWeightMap[answer.fontWeight]} !important;` : ''}
-      ${!isTemplateControlled ? `color: ${answer.color} !important;` : ''}
-      ${!isTemplateControlled ? `padding: 0 ${accordion.paddingX}px ${accordion.paddingY}px !important;` : ''}
-      ${!isTemplateControlled ? `margin: 0 ${accordion.marginX}px ${accordion.marginY}px !important;` : ''}
+      ${!isProtected('answer.fontFamily') ? `font-family: ${fontFamilyMap[answer.fontFamily] || fontFamilyMap.Default} !important;` : ''}
+      ${!isProtected('answer.fontSize') ? `font-size: ${fontSizeMap[answer.fontSize]} !important;` : ''}
+      ${!isProtected('answer.fontWeight') ? `font-weight: ${fontWeightMap[answer.fontWeight]} !important;` : ''}
+      ${!isProtected('answer.color') ? `color: ${answer.color} !important;` : ''}
+      ${!isProtected('accordion.paddingX') && !isProtected('accordion.paddingY') ? `padding: 0 ${accordion.paddingX}px ${accordion.paddingY}px !important;` : 
+        !isProtected('accordion.paddingX') && isProtected('accordion.paddingY') ? `padding-left: ${accordion.paddingX}px !important; padding-right: ${accordion.paddingX}px !important;` :
+        isProtected('accordion.paddingX') && !isProtected('accordion.paddingY') ? `padding-bottom: ${accordion.paddingY}px !important;` : ''}
+      ${!isProtected('accordion.marginX') && !isProtected('accordion.marginY') ? `margin: 0 ${accordion.marginX}px ${accordion.marginY}px !important;` : 
+        !isProtected('accordion.marginX') && isProtected('accordion.marginY') ? `margin-left: ${accordion.marginX}px !important; margin-right: ${accordion.marginX}px !important;` :
+        isProtected('accordion.marginX') && !isProtected('accordion.marginY') ? `margin-bottom: ${accordion.marginY}px !important;` : ''}
       ${accordion.animationType === "Fade" ? `transition: opacity ${accordion.animationDuration}ms !important;` : ""}
       ${accordion.animationType === "Slide" ? `transition: max-height ${accordion.animationDuration}ms !important;` : ""}
     }

@@ -32,7 +32,7 @@ export function TopBar({
     <>
       <div className="flex h-14 items-center justify-between border-b px-4">
         <div className="flex items-center gap-4">
-          <h1 className="text-lg font-semibold">FAQ Embed Generator</h1>
+          <h1 className="text-lg font-semibold">Easy FAQ Generator</h1>
         </div>
         <div className="flex items-center gap-2">
           {!isPaid && (
