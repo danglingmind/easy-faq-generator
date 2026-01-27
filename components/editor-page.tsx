@@ -10,9 +10,10 @@ import { PreviewPanel } from "./preview-panel";
 import { InspectorPanel } from "./inspector-panel";
 import { FAQConfig, FAQContent, FAQStyles } from "@/lib/types";
 import { defaultStyles, templates } from "@/lib/templates";
-import { isPaidFeaturesEnabled, saveEditorState, loadEditorState } from "@/lib/utils";
+import { isPaidFeaturesEnabled, saveEditorState, loadEditorState, isEmbedCodeEnabled } from "@/lib/utils";
 import { extractTemplateStyles } from "@/lib/template-style-extractor";
 import { buildEmbedPayload } from "@/lib/embed-payload";
+import { renderFAQSync } from "@/lib/renderer-v2";
 
 export function EditorPage() {
   const { user, isLoaded } = useUser();
@@ -238,7 +239,93 @@ export function EditorPage() {
     toast.success("Embed configuration loaded!");
   }, []);
 
+  // Helper function to format HTML (same as in preview-panel.tsx)
+  const formatHTML = useCallback((html: string): string => {
+    const scriptStyleRegex = /<(script|style)([^>]*)>([\s\S]*?)<\/\1>/gi;
+    const placeholders: string[] = [];
+    let placeholderIndex = 0;
+    
+    html = html.replace(scriptStyleRegex, (match, tag, attrs, content) => {
+      const placeholder = `__PLACEHOLDER_${placeholderIndex}__`;
+      placeholders[placeholderIndex] = `<${tag}${attrs}>\n${content.trim()}\n</${tag}>`;
+      placeholderIndex++;
+      return placeholder;
+    });
+    
+    let formatted = "";
+    let indent = 0;
+    const tab = "  ";
+    
+    html = html.replace(/>\s+</g, "><");
+    const parts = html.split(/(<[^>]+>|__PLACEHOLDER_\d+__)/);
+    
+    for (const part of parts) {
+      if (!part.trim()) continue;
+      
+      const placeholderMatch = part.match(/^__PLACEHOLDER_(\d+)__$/);
+      if (placeholderMatch) {
+        const placeholderContent = placeholders[parseInt(placeholderMatch[1])];
+        const lines = placeholderContent.split("\n");
+        for (let i = 0; i < lines.length; i++) {
+          if (i === 0) {
+            formatted += tab.repeat(indent) + lines[i] + "\n";
+            indent++;
+          } else if (i === lines.length - 1) {
+            indent--;
+            formatted += tab.repeat(indent) + lines[i] + "\n";
+          } else {
+            formatted += tab.repeat(indent) + lines[i] + "\n";
+          }
+        }
+        continue;
+      }
+      
+      if (part.startsWith("</")) {
+        indent = Math.max(0, indent - 1);
+        formatted += tab.repeat(indent) + part + "\n";
+      } else if (part.startsWith("<")) {
+        formatted += tab.repeat(indent) + part + "\n";
+        if (!part.includes("/>") && !part.match(/<(meta|link|br|hr|img|input)/i)) {
+          indent++;
+        }
+      } else {
+        const trimmed = part.trim();
+        if (trimmed) {
+          formatted += tab.repeat(indent) + trimmed + "\n";
+        }
+      }
+    }
+    
+    return formatted.trim();
+  }, []);
+
   const handleCopyEmbed = useCallback(async () => {
+    const embedCodeEnabled = isEmbedCodeEnabled();
+
+    // If embed code is disabled, copy complete HTML code instead
+    if (!embedCodeEnabled) {
+      try {
+        // Load template
+        const templateResponse = await fetch(`/api/templates/${config.template}`);
+        if (!templateResponse.ok) {
+          throw new Error("Failed to load template");
+        }
+        const template = await templateResponse.json();
+        
+        // Generate complete HTML
+        const { html } = renderFAQSync(config, template);
+        const formattedHTML = formatHTML(html);
+        
+        await navigator.clipboard.writeText(formattedHTML);
+        toast.success("Complete HTML code copied to clipboard!");
+      } catch (error) {
+        console.error("Failed to copy code:", error);
+        toast.error("Failed to copy code. Please try again.");
+      }
+      return;
+    }
+
+    // Original embed code logic
     // Copy embed always requires login.
     if (!isSignedIn) {
       router.push("/sign-in");
@@ -317,7 +404,7 @@ export function EditorPage() {
       console.error("Failed to copy embed code:", error);
       toast.error("Failed to copy embed code. Please try again.");
     }
-  }, [embedCopied, embedCopyStorageKey, isPaid, isSignedIn, router, config, currentEmbedId]);
+  }, [embedCopied, embedCopyStorageKey, isPaid, isSignedIn, router, config, currentEmbedId, formatHTML]);
 
   if (!isLoaded) {
     return (

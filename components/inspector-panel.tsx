@@ -21,6 +21,7 @@ import { AccordionControls } from "./accordion-controls";
 import { SpacingControls } from "./spacing-controls";
 import { EmbedSelector } from "./embed-selector";
 import { FAQConfig } from "@/lib/types";
+import { isEmbedCodeEnabled } from "@/lib/utils";
 
 interface InspectorPanelProps {
   selectedTemplate: string;
@@ -46,11 +47,12 @@ export function InspectorPanel({
   onLoadEmbed,
 }: InspectorPanelProps) {
   const router = useRouter();
+  const embedCodeEnabled = isEmbedCodeEnabled();
 
   return (
     <div className="w-[340px] overflow-y-auto border-l bg-muted/30 p-4">
       <div className="space-y-6">
-        {isSignedIn && onLoadEmbed && (
+        {embedCodeEnabled && isSignedIn && onLoadEmbed && (
           <div>
             <div className="mb-2 flex items-center justify-between">
               <Label>Saved Embeds</Label>
@@ -160,16 +162,18 @@ export function InspectorPanel({
             size="lg"
             className="w-full"
             onClick={onCopyEmbed}
-            disabled={!isSignedIn || (embedCopied && !isPaid)}
+            disabled={embedCodeEnabled && (!isSignedIn || (embedCopied && !isPaid))}
           >
             <IconCopy className="mr-2 h-4 w-4" />
-            {!isSignedIn
-              ? "Sign in to Copy Embed Code"
-              : embedCopied && !isPaid
-                ? "Embed Code Copied"
-                : "Copy Embed Code"}
+            {embedCodeEnabled
+              ? !isSignedIn
+                ? "Sign in to Copy Embed Code"
+                : embedCopied && !isPaid
+                  ? "Embed Code Copied"
+                  : "Copy Embed Code"
+              : "Copy Code"}
           </Button>
-          {embedCopied && !isPaid && (
+          {embedCodeEnabled && embedCopied && !isPaid && (
             <p className="mt-2 text-center text-xs text-muted-foreground">
               Upgrade for unlimited copies
             </p>

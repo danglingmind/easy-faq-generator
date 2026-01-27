@@ -17,6 +17,13 @@ export function isCodePreviewEnabled(): boolean {
   return process.env.NEXT_PUBLIC_ENABLE_CODE_PREVIEW === "true";
 }
 
+// Check if embed code feature is enabled via env var
+// Set NEXT_PUBLIC_ENABLE_EMBED_CODE=false to disable embed code feature
+// When disabled, users will copy complete HTML code instead of embed script
+export function isEmbedCodeEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_ENABLE_EMBED_CODE !== "false";
+}
+
 // Storage keys for preserving editor state
 const STORAGE_KEY = "faq-editor-state";
 
