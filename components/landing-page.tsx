@@ -179,7 +179,13 @@ export function LandingPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-2">
-              <IconSparkles className="h-6 w-6 text-primary" />
+              <Image
+                src="/logo.png"
+                alt="Easy FAQ Generator Logo"
+                width={48}
+                height={48}
+                className="h-12 w-12 rounded-lg"
+              />
               <span className="text-lg font-semibold">Easy FAQ Generator</span>
             </div>
             <div className="flex items-center gap-3">
@@ -581,7 +587,13 @@ export function LandingPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-muted-foreground">
-              <IconSparkles className="h-5 w-5" />
+              <Image
+                src="/logo.png"
+                alt="Easy FAQ Generator Logo"
+                width={20}
+                height={20}
+                className="h-5 w-5 rounded-lg"
+              />
               <span className="text-sm">Easy FAQ Generator</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">

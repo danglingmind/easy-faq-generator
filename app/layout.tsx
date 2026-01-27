@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   title: "Easy FAQ Generator",
   description: "Generate SEO-optimized FAQ sections for your website",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 // Force dynamic rendering to prevent Clerk validation errors during build
