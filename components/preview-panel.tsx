@@ -27,6 +27,7 @@ export function PreviewPanel({
   const [templateCache, setTemplateCache] = useState<{ html: string; css: string; js?: string } | null>(null);
   const [codeCopied, setCodeCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("preview");
+  const [iframeKey, setIframeKey] = useState(0);
   
   // Check if code preview feature is enabled
   const codePreviewEnabled = isCodePreviewEnabled();
@@ -47,6 +48,13 @@ export function PreviewPanel({
     
     // Format HTML for better readability
     return formatHTML(html);
+  }, [config, templateCache]);
+
+  // Generate HTML for iframe srcdoc
+  const iframeHTML = useMemo(() => {
+    if (!templateCache) return "";
+    const { html } = renderFAQSync(config, templateCache);
+    return html;
   }, [config, templateCache]);
 
   // Copy code to clipboard
@@ -157,179 +165,13 @@ export function PreviewPanel({
     loadTemplate();
   }, [config.template]);
 
+  // Force iframe reload when switching to preview tab or when config changes
   useEffect(() => {
-    if (!iframeRef.current || !templateCache) return;
-
-    const iframe = iframeRef.current;
-    const doc = iframe.contentDocument || iframe.contentWindow?.document;
-    if (!doc) return;
-
-    // Use template-based renderer
-    const { html } = renderFAQSync(config, templateCache);
-
-    doc.open();
-    doc.write(html);
-    doc.close();
-
-    // CRITICAL: In production (Vercel/Fly.io), scripts in doc.write() may not execute
-    // We need to explicitly extract and execute scripts after the iframe loads
-    const executeScripts = () => {
-      try {
-        // Wait for iframe to be ready
-        if (doc.readyState === 'loading') {
-          doc.addEventListener('DOMContentLoaded', executeScripts);
-          return;
-        }
-
-        // Find all script tags in the iframe
-        const scripts = Array.from(doc.querySelectorAll('script'));
-        
-        scripts.forEach((oldScript, index) => {
-          // Skip JSON-LD scripts
-          const scriptType = (oldScript.type || '').toLowerCase();
-          if (scriptType === 'application/ld+json' || 
-              scriptType === 'application/json' ||
-              scriptType.startsWith('application/')) {
-            return;
-          }
-
-          // Skip if content looks like JSON
-          const content = oldScript.textContent || '';
-          if (content.trim().startsWith('{') || content.trim().startsWith('[')) {
-            return;
-          }
-
-          if (oldScript.src) {
-            // External script - create new script element
-            const newScript = doc.createElement('script');
-            newScript.src = oldScript.src;
-            newScript.async = oldScript.async;
-            newScript.defer = oldScript.defer;
-            doc.head.appendChild(newScript);
-            oldScript.remove();
-          } else if (content.trim()) {
-            // Inline script - execute it
-            const newScript = doc.createElement('script');
-            newScript.textContent = content;
-            // Remove old script first
-            oldScript.remove();
-            // Append new script to trigger execution
-            doc.body.appendChild(newScript);
-            // Remove after execution
-            setTimeout(() => {
-              if (newScript.parentNode) {
-                newScript.parentNode.removeChild(newScript);
-              }
-            }, 0);
-          }
-        });
-
-        // Also manually initialize accordion as fallback
-        // This ensures it works even if script execution fails
-        setTimeout(() => {
-          const containers = doc.querySelectorAll('.faq-container');
-          if (containers.length > 0) {
-            containers.forEach((container) => {
-              const items = container.querySelectorAll('.faq-item');
-              const animationType = container.getAttribute('data-animation-type') || 'Fade';
-              const animationDuration = parseInt(container.getAttribute('data-animation-duration') || '300', 10);
-              const mode = container.getAttribute('data-accordion-mode') || 'single';
-
-              items.forEach((item, idx) => {
-                const button = item.querySelector('[data-accordion-button]') as HTMLElement;
-                const answer = item.querySelector('.faq-answer') as HTMLElement;
-                
-                if (!button || !answer) return;
-
-                // Set initial state - close items by default
-                const dataOpen = item.getAttribute('data-open');
-                if (dataOpen !== 'true') {
-                  if (animationType === 'Fade') {
-                    answer.style.transition = `opacity ${animationDuration}ms`;
-                    answer.style.opacity = '0';
-                    answer.hidden = true;
-                  } else if (animationType === 'Slide') {
-                    answer.style.transition = `max-height ${animationDuration}ms`;
-                    answer.style.overflow = 'hidden';
-                    answer.style.maxHeight = '0px';
-                    answer.hidden = true;
-                  } else {
-                    answer.hidden = true;
-                  }
-                  button.setAttribute('aria-expanded', 'false');
-                  item.setAttribute('data-open', 'false');
-                }
-
-                // Attach click handler
-                const newButton = button.cloneNode(true);
-                button.parentNode?.replaceChild(newButton, button);
-                
-                newButton.addEventListener('click', function(e) {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  
-                  const currentlyOpen = item.getAttribute('data-open') === 'true';
-                  const nextOpen = !currentlyOpen;
-                  
-                  // Close other items if single mode
-                  if (mode === 'single' && nextOpen) {
-                    items.forEach((other) => {
-                      if (other !== item) {
-                        const otherAnswer = other.querySelector('.faq-answer') as HTMLElement;
-                        const otherButton = other.querySelector('[data-accordion-button]') as HTMLElement;
-                        if (otherAnswer && otherButton) {
-                          if (animationType === 'Fade') {
-                            otherAnswer.style.opacity = '0';
-                          } else if (animationType === 'Slide') {
-                            otherAnswer.style.maxHeight = '0px';
-                          }
-                          otherAnswer.hidden = true;
-                          otherButton.setAttribute('aria-expanded', 'false');
-                          other.setAttribute('data-open', 'false');
-                        }
-                      }
-                    });
-                  }
-                  
-                  // Toggle current item
-                  item.setAttribute('data-open', nextOpen ? 'true' : 'false');
-                  (newButton as HTMLElement).setAttribute('aria-expanded', String(nextOpen));
-                  
-                  if (animationType === 'Slide') {
-                    answer.hidden = false;
-                    answer.style.overflow = 'hidden';
-                    answer.style.transition = `max-height ${animationDuration}ms`;
-                    if (nextOpen) {
-                      answer.style.maxHeight = answer.scrollHeight + 'px';
-                    } else {
-                      answer.style.maxHeight = '0px';
-                      setTimeout(() => {
-                        answer.hidden = true;
-                      }, animationDuration);
-                    }
-                  } else if (animationType === 'Fade') {
-                    answer.style.transition = `opacity ${animationDuration}ms`;
-                    answer.style.opacity = nextOpen ? '1' : '0';
-                    answer.hidden = !nextOpen;
-                  } else {
-                    answer.hidden = !nextOpen;
-                  }
-                });
-              });
-            });
-          }
-        }, 100);
-      } catch (error) {
-        console.error('[Preview] Error executing scripts in iframe:', error);
-      }
-    };
-
-    // Execute scripts after iframe content is written
-    // Use multiple attempts to handle timing issues
-    executeScripts();
-    setTimeout(executeScripts, 50);
-    setTimeout(executeScripts, 200);
-  }, [config, templateCache]);
+    if (activeTab === "preview" && templateCache) {
+      // Increment key to force iframe remount/reload
+      setIframeKey(prev => prev + 1);
+    }
+  }, [activeTab, config, templateCache]);
 
   return (
     <div className="flex flex-1 flex-col bg-muted/20 min-h-0">
@@ -390,9 +232,152 @@ export function PreviewPanel({
               }`}
             >
               <iframe
+                key={iframeKey}
                 ref={iframeRef}
                 className="h-full w-full border-0"
                 title="FAQ Preview"
+                srcDoc={iframeHTML || undefined}
+                onLoad={() => {
+                  // Execute scripts and initialize accordion after iframe loads
+                  if (activeTab === "preview" && iframeRef.current && templateCache) {
+                    const iframe = iframeRef.current;
+                    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+                    if (!doc) return;
+
+                    const executeScripts = () => {
+                      try {
+                        // Execute inline scripts
+                        const scripts = Array.from(doc.querySelectorAll('script'));
+                        scripts.forEach((oldScript) => {
+                          const scriptType = (oldScript.type || '').toLowerCase();
+                          if (scriptType === 'application/ld+json' || scriptType === 'application/json' || scriptType.startsWith('application/')) {
+                            return;
+                          }
+                          const content = oldScript.textContent || '';
+                          if (content.trim().startsWith('{') || content.trim().startsWith('[')) {
+                            return;
+                          }
+                          if (oldScript.src) {
+                            const newScript = doc.createElement('script');
+                            newScript.src = oldScript.src;
+                            newScript.async = oldScript.async;
+                            newScript.defer = oldScript.defer;
+                            doc.head.appendChild(newScript);
+                            oldScript.remove();
+                          } else if (content.trim()) {
+                            const newScript = doc.createElement('script');
+                            newScript.textContent = content;
+                            oldScript.remove();
+                            doc.body.appendChild(newScript);
+                            setTimeout(() => {
+                              if (newScript.parentNode) {
+                                newScript.parentNode.removeChild(newScript);
+                              }
+                            }, 0);
+                          }
+                        });
+
+                        // Initialize accordion manually as fallback
+                        setTimeout(() => {
+                          const containers = doc.querySelectorAll('.faq-container');
+                          if (containers.length > 0) {
+                            containers.forEach((container) => {
+                              const items = container.querySelectorAll('.faq-item');
+                              const animationType = container.getAttribute('data-animation-type') || 'Fade';
+                              const animationDuration = parseInt(container.getAttribute('data-animation-duration') || '300', 10);
+                              const mode = container.getAttribute('data-accordion-mode') || 'single';
+
+                              items.forEach((item) => {
+                                const button = item.querySelector('[data-accordion-button]') as HTMLElement;
+                                const answer = item.querySelector('.faq-answer') as HTMLElement;
+                                
+                                if (!button || !answer) return;
+
+                                const dataOpen = item.getAttribute('data-open');
+                                if (dataOpen !== 'true') {
+                                  if (animationType === 'Fade') {
+                                    answer.style.transition = `opacity ${animationDuration}ms`;
+                                    answer.style.opacity = '0';
+                                    answer.hidden = true;
+                                  } else if (animationType === 'Slide') {
+                                    answer.style.transition = `max-height ${animationDuration}ms`;
+                                    answer.style.overflow = 'hidden';
+                                    answer.style.maxHeight = '0px';
+                                    answer.hidden = true;
+                                  } else {
+                                    answer.hidden = true;
+                                  }
+                                  button.setAttribute('aria-expanded', 'false');
+                                  item.setAttribute('data-open', 'false');
+                                }
+
+                                const newButton = button.cloneNode(true);
+                                button.parentNode?.replaceChild(newButton, button);
+                                
+                                newButton.addEventListener('click', function(e) {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  
+                                  const currentlyOpen = item.getAttribute('data-open') === 'true';
+                                  const nextOpen = !currentlyOpen;
+                                  
+                                  if (mode === 'single' && nextOpen) {
+                                    items.forEach((other) => {
+                                      if (other !== item) {
+                                        const otherAnswer = other.querySelector('.faq-answer') as HTMLElement;
+                                        const otherButton = other.querySelector('[data-accordion-button]') as HTMLElement;
+                                        if (otherAnswer && otherButton) {
+                                          if (animationType === 'Fade') {
+                                            otherAnswer.style.opacity = '0';
+                                          } else if (animationType === 'Slide') {
+                                            otherAnswer.style.maxHeight = '0px';
+                                          }
+                                          otherAnswer.hidden = true;
+                                          otherButton.setAttribute('aria-expanded', 'false');
+                                          other.setAttribute('data-open', 'false');
+                                        }
+                                      }
+                                    });
+                                  }
+                                  
+                                  item.setAttribute('data-open', nextOpen ? 'true' : 'false');
+                                  (newButton as HTMLElement).setAttribute('aria-expanded', String(nextOpen));
+                                  
+                                  if (animationType === 'Slide') {
+                                    answer.hidden = false;
+                                    answer.style.overflow = 'hidden';
+                                    answer.style.transition = `max-height ${animationDuration}ms`;
+                                    if (nextOpen) {
+                                      answer.style.maxHeight = answer.scrollHeight + 'px';
+                                    } else {
+                                      answer.style.maxHeight = '0px';
+                                      setTimeout(() => {
+                                        answer.hidden = true;
+                                      }, animationDuration);
+                                    }
+                                  } else if (animationType === 'Fade') {
+                                    answer.style.transition = `opacity ${animationDuration}ms`;
+                                    answer.style.opacity = nextOpen ? '1' : '0';
+                                    answer.hidden = !nextOpen;
+                                  } else {
+                                    answer.hidden = !nextOpen;
+                                  }
+                                });
+                              });
+                            });
+                          }
+                        }, 100);
+                      } catch (error) {
+                        console.error('[Preview] Error in onLoad:', error);
+                      }
+                    };
+
+                    // Execute scripts with multiple attempts
+                    executeScripts();
+                    setTimeout(executeScripts, 50);
+                    setTimeout(executeScripts, 200);
+                  }
+                }}
               />
             </div>
           </div>
