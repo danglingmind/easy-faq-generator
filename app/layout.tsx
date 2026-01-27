@@ -25,10 +25,7 @@ export const metadata: Metadata = {
   description: "Generate SEO-optimized FAQ sections for your website",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   icons: {
-    icon: [
-      { url: "/logo.png", sizes: "any" },
-      { url: "/logo.png", type: "image/png" },
-    ],
+    icon: "/logo.png",
     shortcut: "/logo.png",
     apple: "/logo.png",
   },
