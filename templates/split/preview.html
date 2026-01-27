@@ -42,8 +42,410 @@
         Replace <code>YOUR_EMBED_ID</code> with your actual embed ID from the editor.
       </p>
       <div class="card">
-        <div data-faq-embed="vlw3lsp6sgx6vvqgqmytj5si" data-faq-origin="https://easy-faq-generator.fly.dev"></div>
-        <script src="https://easy-faq-generator.fly.dev/faq-embed.js" async></script>
+        <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>
+        FAQ
+      </title>
+      <style>
+        /* Template Base Styles */
+        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@1,500&display=swap");
+        
+        /* Split template specific styles */
+        .faq-container {
+          background: #153825 !important;
+          padding: 56px 64px !important;
+          font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+          min-height: 100vh !important;
+        }
+        
+        .faq-layout {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 72px;
+          max-width: 1180px;
+          margin: 0 auto;
+        }
+        
+        .faq-left {
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+        }
+        
+        .faq-heading {
+          font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+          font-size: 2.75rem !important;
+          font-weight: 600 !important;
+          color: #f2f5ee !important;
+          margin: 0 0 18px 0 !important;
+          line-height: 1.15 !important;
+        }
+        
+        .faq-heading .heading-line {
+          display: block;
+        }
+        
+        .faq-heading .heading-line > span + span {
+          margin-left: 6px;
+        }
+        
+        .faq-heading .highlight {
+          font-family: "Playfair Display", "Times New Roman", serif !important;
+          font-style: italic !important;
+          font-weight: 500 !important;
+          color: #cbdc7a !important;
+        }
+        
+        .faq-description {
+          font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+          font-size: 0.95rem !important;
+          font-weight: 400 !important;
+          color: #c7d2c1 !important;
+          margin: 0 !important;
+          line-height: 1.6 !important;
+        }
+        
+        .faq-right {
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .faq-items {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        
+        .faq-item {
+          margin: 0 !important;
+          border-radius: 0 !important;
+          border: none !important;
+          background: transparent !important;
+          overflow: hidden !important;
+          padding: 16px 0 !important;
+          border-bottom: 1px solid rgba(203, 220, 122, 0.35) !important;
+        }
+        
+        .faq-question {
+          font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+          font-size: 1rem !important;
+          font-weight: 500 !important;
+          color: #e6ece0 !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          cursor: pointer !important;
+          display: flex !important;
+          justify-content: space-between !important;
+          align-items: center !important;
+          background: transparent !important;
+          border: none !important;
+          width: 100% !important;
+          text-align: left !important;
+          gap: 20px !important;
+        }
+        
+        .faq-question:hover {
+          opacity: 0.9;
+        }
+        
+        .faq-question > span:first-child {
+          flex: 1 1 auto;
+        }
+        
+        .faq-answer {
+          font-family: "Inter", system-ui, -apple-system, sans-serif !important;
+          font-size: 0.9rem !important;
+          font-weight: 400 !important;
+          color: #aeb9a4 !important;
+          padding: 10px 0 0 0 !important;
+          margin: 0 !important;
+          line-height: 1.6 !important;
+        }
+        
+        .faq-answer[hidden] {
+          display: none;
+        }
+        
+        .faq-icon {
+          flex-shrink: 0 !important;
+          width: 16px !important;
+          height: 16px !important;
+          color: #d9e3cf !important;
+          stroke: currentColor !important;
+          stroke-width: 2 !important;
+          margin-left: 16px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+        
+        /* Rotate icon when open */
+        .faq-item[data-open="true"] .faq-icon {
+          transform: rotate(180deg);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+          .faq-container {
+            padding: 32px 24px;
+          }
+        
+          .faq-layout {
+            grid-template-columns: 1fr;
+            gap: 32px;
+          }
+        
+          .faq-heading {
+            font-size: 2.2rem;
+          }
+        }
+        
+        
+        /* User Customizations */
+        
+            @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+        
+            /* Use higher specificity selector for templates that use data-template attribute */
+            /* Use higher specificity selector for templates that use data-template attribute */
+            .faq-container[data-template="split"] {
+              background: #153825 !important;
+              padding: 56px !important;
+              font-family: Inter, sans-serif !important;
+            }
+            .faq-container[data-template="split"] .faq-heading {
+              font-family: Inter, sans-serif !important;
+              font-size: 2.25rem !important;
+              font-weight: 600 !important;
+              color: #f2f5ee !important;
+            }
+            .faq-container[data-template="split"] .faq-description {
+              font-family: Inter, sans-serif !important;
+              font-size: 0.875rem !important;
+              font-weight: 400 !important;
+              color: #c7d2c1 !important;
+            }
+            /* Use higher specificity selector for templates that use data-template attribute */
+            .faq-container[data-template="split"] .faq-item {
+              margin-bottom: 16px !important;
+              
+                /* Explicitly set each border side individually for proper control */
+                
+                
+                border-bottom: 1px solid #e5e5e5 !important;
+                
+              
+            }
+            /* Use higher specificity selector for templates that use data-template attribute */
+            .faq-container[data-template="split"] .faq-question {
+              font-family: Inter, sans-serif !important;
+              font-size: 1rem !important;
+              font-weight: 500 !important;
+              color: #e6ece0 !important;
+              padding: 16px 16px !important;
+              margin: 8px 0px !important;
+            }
+            .faq-container[data-template="split"] .faq-answer {
+              font-family: Inter, sans-serif !important;
+              font-size: 0.875rem !important;
+              font-weight: 400 !important;
+              color: #aeb9a4 !important;
+              padding: 0 16px 16px !important;
+              margin: 0 0px 8px !important;
+              transition: opacity 300ms !important;
+              
+            }
+            .faq-icon {
+              transition: transform 300ms !important;
+            }
+      </style>
+    </head>
+    <body>
+      <div class="faq-container" data-template="split" data-animation-type="Fade" data-animation-duration="300" data-accordion-mode="single">
+        <div class="faq-layout">
+          <div class="faq-left">
+            <h2 class="faq-heading">
+              <span class="heading-line">
+                <span>
+                  Frequently
+                </span>
+                <span class="highlight">
+                  Asked
+                </span>
+              </span>
+              <span class="heading-line">
+                Questions
+              </span>
+            </h2>
+            <p class="faq-description">
+              Find answers to common questions about our product.
+            </p>
+          </div>
+          <div class="faq-right">
+            <div class="faq-items">
+              <div class="faq-item" data-open="false">
+                <button
+        class="faq-question"
+        data-accordion-button
+        aria-expanded="false"
+        aria-controls="faq-answer-0"
+        id="faq-question-0"
+      >
+                  <span>
+                    Who is thi tool best for ?
+                  </span>
+                  <span class="faq-icon">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                      <path d="M4 6 L8 10 L12 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                </button>
+                <div
+        class="faq-answer"
+        id="faq-answer-0"
+        role="region"
+        aria-labelledby="faq-question-0"
+      >
+                  This FAQ creator tool is ideal for small businesses, marketing teams, content creators, and website owners looking to boost SEO rankings, improve user experience, and streamline customer support. It works well for teams of all sizes because it&#039;s built to be flexible and scalable, requiring no technical expertise.
+                </div>
+              </div>
+              <div class="faq-item" data-open="false">
+                <button
+        class="faq-question"
+        data-accordion-button
+        aria-expanded="false"
+        aria-controls="faq-answer-1"
+        id="faq-question-1"
+      >
+                  <span>
+                    Is there a free plan ?
+                  </span>
+                  <span class="faq-icon">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                      <path d="M4 6 L8 10 L12 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                </button>
+                <div
+        class="faq-answer"
+        id="faq-answer-1"
+        role="region"
+        aria-labelledby="faq-question-1"
+      >
+                  Yes — we offer a trial option so you can experience key features before committing to a paid plan. You can upgrade or switch plans anytime without losing your data or FAQ configurations.
+                </div>
+              </div>
+              <div class="faq-item" data-open="false">
+                <button
+        class="faq-question"
+        data-accordion-button
+        aria-expanded="false"
+        aria-controls="faq-answer-2"
+        id="faq-question-2"
+      >
+                  <span>
+                    What features are included in this price plan ?
+                  </span>
+                  <span class="faq-icon">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+                      <path d="M4 6 L8 10 L12 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                </button>
+                <div
+        class="faq-answer"
+        id="faq-answer-2"
+        role="region"
+        aria-labelledby="faq-question-2"
+      >
+                  We offer tiered pricing plans designed for different needs: Starter plan includes core features and essentials for creating basic FAQ sections. Pro plan includes advanced customization tools, multiple templates, and integrations. Enterprise plan provides full access with custom support, onboarding, and priority assistance. Each plan clearly lists included features, so you can choose what matches your use case.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script type="application/ld+json">
+        {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Who is thi tool best for ?","acceptedAnswer":{"@type":"Answer","text":"This FAQ creator tool is ideal for small businesses, marketing teams, content creators, and website owners looking to boost SEO rankings, improve user experience, and streamline customer support. It works well for teams of all sizes because it's built to be flexible and scalable, requiring no technical expertise."}},{"@type":"Question","name":"Is there a free plan ?","acceptedAnswer":{"@type":"Answer","text":"Yes — we offer a trial option so you can experience key features before committing to a paid plan. You can upgrade or switch plans anytime without losing your data or FAQ configurations."}},{"@type":"Question","name":"What features are included in this price plan ?","acceptedAnswer":{"@type":"Answer","text":"We offer tiered pricing plans designed for different needs: Starter plan includes core features and essentials for creating basic FAQ sections. Pro plan includes advanced customization tools, multiple templates, and integrations. Enterprise plan provides full access with custom support, onboarding, and priority assistance. Each plan clearly lists included features, so you can choose what matches your use case."}}]}
+      </script>
+      <script>
+        (function () {
+              function getConfig(container) {
+                const type = container.getAttribute("data-animation-type") || "Fade";
+                const duration = parseInt(container.getAttribute("data-animation-duration") || "300", 10);
+                const mode = container.getAttribute("data-accordion-mode") || "single";
+                return { type, duration, mode };
+              }
+        
+              function setAnswerState(item, isOpen, config) {
+                const button = item.querySelector("[data-accordion-button]");
+                const answer = item.querySelector(".faq-answer");
+                if (!button || !answer) return;
+        
+                item.setAttribute("data-open", isOpen ? "true" : "false");
+                button.setAttribute("aria-expanded", String(isOpen));
+        
+                if (config.type === "Slide") {
+                  answer.hidden = false;
+                  answer.style.overflow = "hidden";
+                  answer.style.transition = "max-height " + config.duration + "ms";
+                  if (isOpen) {
+                    answer.style.maxHeight = answer.scrollHeight + "px";
+                  } else {
+                    answer.style.maxHeight = "0px";
+                    window.setTimeout(() => {
+                      answer.hidden = true;
+                    }, config.duration);
+                  }
+                } else if (config.type === "Fade") {
+                  answer.style.transition = "opacity " + config.duration + "ms";
+                  answer.style.opacity = isOpen ? "1" : "0";
+                  answer.hidden = !isOpen;
+                } else {
+                  answer.hidden = !isOpen;
+                }
+              }
+        
+              function init(container) {
+                const config = getConfig(container);
+                const items = Array.from(container.querySelectorAll(".faq-item"));
+                items.forEach((item, index) => {
+                  const button = item.querySelector("[data-accordion-button]");
+                  const answer = item.querySelector(".faq-answer");
+                  if (!button || !answer) return;
+        
+                  if (!answer.id) answer.id = "faq-answer-" + index;
+                  if (!button.id) button.id = "faq-question-" + index;
+                  button.setAttribute("aria-controls", answer.id);
+                  answer.setAttribute("role", "region");
+                  answer.setAttribute("aria-labelledby", button.id);
+        
+                  const isOpen = item.getAttribute("data-open") === "true";
+                  setAnswerState(item, isOpen, config);
+        
+                  button.addEventListener("click", () => {
+                    const currentlyOpen = item.getAttribute("data-open") === "true";
+                    const nextOpen = !currentlyOpen;
+                    if (config.mode === "single" && nextOpen) {
+                      items.forEach((other) => {
+                        if (other !== item) {
+                          setAnswerState(other, false, config);
+                        }
+                      });
+                    }
+                    setAnswerState(item, nextOpen, config);
+                  });
+                });
+              }
+        
+              document.querySelectorAll(".faq-container").forEach(init);
+            })();
+      </script>
+    </body>
+  </html>
       </div>
     </div>
 
