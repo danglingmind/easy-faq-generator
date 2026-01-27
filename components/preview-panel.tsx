@@ -398,17 +398,19 @@ export function PreviewPanel({
           </div>
         </TabsContent>
         {codePreviewEnabled && (
-          <TabsContent value="code" className="flex flex-1 m-0 mt-0 overflow-hidden min-h-0 data-[state=active]:flex data-[state=inactive]:hidden">
-            <div className="h-full w-full overflow-auto bg-background p-4 min-h-0">
-              <div className="relative h-full min-h-0">
-                <pre className="h-full overflow-auto rounded-md border bg-muted p-4 text-sm font-mono min-h-0">
+          <TabsContent
+            value="code"
+            className="flex flex-1 flex-col m-0 mt-0 overflow-hidden min-h-0 data-[state=active]:flex data-[state=inactive]:hidden"
+            // Avoid horizontal growth beyond parent!
+            style={{ minHeight: 0, height: "100%" }}
+          >
+            <div className="flex-1 flex flex-col h-0 min-h-0 overflow-hidden bg-background p-4">
+              <div className="relative flex-1 min-h-0 h-0">
+                <pre className="absolute inset-0 overflow-auto rounded-md border bg-muted p-4 text-sm font-mono min-h-0 m-0"
+                  style={{ maxHeight: "100%", minHeight: 0, height: "100%" }}
+                >
                   <code className="text-foreground whitespace-pre">{completeHTMLCode}</code>
                 </pre>
-                {!currentEmbedId && (
-                  <div className="absolute top-4 right-4 rounded-md bg-blue-100 dark:bg-blue-900/20 px-3 py-2 text-xs text-blue-800 dark:text-blue-200 border border-blue-300 dark:border-blue-800 max-w-xs z-10">
-                    <strong>Note:</strong> This is the complete HTML that will be injected by the embed script. Save your embed to get a real embed ID.
-                  </div>
-                )}
               </div>
             </div>
           </TabsContent>
