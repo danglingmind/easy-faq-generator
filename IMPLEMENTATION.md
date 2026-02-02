@@ -72,6 +72,9 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 STRIPE_SECRET_KEY=your_stripe_key
 STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
 DATABASE_URL=your_database_url
+
+# Google Analytics 4 (optional)
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
 ### Clerk Setup
@@ -95,7 +98,7 @@ DATABASE_URL=your_database_url
 - [ ] Upgrade flow UI
 
 ### Analytics
-- [ ] Google Analytics integration
+- ✅ Google Analytics 4 integration
 - [ ] Microsoft Clarity integration
 - [ ] Event tracking (template selection, embed copies, upgrades)
 

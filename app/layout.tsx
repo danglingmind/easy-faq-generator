@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import "./globals.css";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -55,6 +56,7 @@ export default function RootLayout({
             {children}
             <Toaster />
           </ThemeProvider>
+          <GoogleAnalytics />
         </body>
       </html>
     </ClerkProvider>
