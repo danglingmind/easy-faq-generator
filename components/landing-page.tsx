@@ -217,13 +217,13 @@ export function LandingPage() {
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-                FAQ Generator Tool -{" "}
-                <span className="text-primary">No Code Platform</span> for FAQ Creator
+                Rank higher with SEO optimized FAQ Sections & {" "}
+                <span className="text-primary">Turn FAQs into Ranking Assets</span>
               </h1>
               <p className="text-xl text-muted-foreground leading-relaxed">
-                The best <strong>FAQ generator tool</strong> and <strong>no code platform</strong> for creating beautiful FAQ sections. 
-                Use our <strong>FAQ creator tool</strong> to build SEO-optimized FAQ embeds that boost your search rankings. 
-                No coding required—design, customize, and embed in minutes.
+                Transform simple questions into powerful <strong>SEO assets</strong>. 
+                Generate structured, schema-ready FAQ sections designed to improve search visibility and increase your chances of <strong>ranking higher on Google</strong>. 
+                Build, customize, and embed high-performing FAQ blocks in minutes — no coding required.
               </p>
             </div>
             
@@ -251,11 +251,15 @@ export function LandingPage() {
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <IconCircleCheck className="h-5 w-5 text-primary" />
-                <span>No credit card required</span>
+                <span>Free to use</span>
               </div>
               <div className="flex items-center gap-2">
                 <IconCircleCheck className="h-5 w-5 text-primary" />
                 <span>No coding required</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <IconCircleCheck className="h-5 w-5 text-primary" />
+                <span>Unlimited usage</span>
               </div>
             </div>
           </div>
@@ -278,40 +282,44 @@ export function LandingPage() {
       </section>
 
       {/* No Code Platform Section */}
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 border-t border-border/40 bg-muted/30">
+     <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 border-t border-border/40 bg-muted/30">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <div className="space-y-4">
             <h2 className="text-3xl sm:text-4xl font-bold">
-              The Best No Code Platform for FAQ Creation
+              Build FAQ Sections That Help You Rank Higher
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Our <strong>FAQ generator tool</strong> is the perfect <strong>no code platform</strong> for anyone who wants to create 
-              professional FAQ sections without technical expertise. Whether you're a marketer, business owner, or content creator, 
-              our <strong>FAQ creator tool</strong> makes it easy to build, customize, and deploy beautiful FAQ sections in minutes—no coding skills required.
+              Our <strong>SEO FAQ generator</strong> helps you create FAQ sections designed to improve your search rankings. 
+              Add structured FAQ schema markup to your pages, increase your chances of appearing in rich results, 
+              and bring more organic traffic to your website — all without writing any code.
+              Whether you run a blog, SaaS product, or business website, you can create SEO-friendly FAQ sections in minutes.
             </p>
           </div>
+
           <div className="grid md:grid-cols-3 gap-6 mt-12">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">No Code Required</CardTitle>
+                <CardTitle className="text-lg">SEO-Optimized Structure</CardTitle>
                 <CardDescription>
-                  Build professional FAQ sections using our intuitive visual editor. No programming knowledge needed.
+                  Generate FAQ sections with built-in schema markup that search engines understand and reward.
                 </CardDescription>
               </CardHeader>
             </Card>
+
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Easy to Use</CardTitle>
+                <CardTitle className="text-lg">Improve Search Visibility</CardTitle>
                 <CardDescription>
-                  Our FAQ generator tool gives you everything you need to create and embed FAQ sections quickly and easily.
+                  Increase your chances of ranking higher on Google and appearing in rich results with properly structured FAQs.
                 </CardDescription>
               </CardHeader>
             </Card>
+
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Easy FAQ Creator</CardTitle>
+                <CardTitle className="text-lg">No Code, Fast Setup</CardTitle>
                 <CardDescription>
-                  Use our FAQ creator tool to add questions, customize styles, and generate embed code in just a few clicks.
+                  Create, customize, and embed SEO-ready FAQ sections in minutes — no technical skills required.
                 </CardDescription>
               </CardHeader>
             </Card>
