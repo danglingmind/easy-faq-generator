@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { ColorInput } from "@/components/ui/color-input";
 import { FAQStyles } from "@/lib/types";
 
 interface TypographyControlsProps {
@@ -240,23 +241,13 @@ export function TypographyControls({
               </div>
               <div>
                 <Label className="text-xs">Color</Label>
-                <div className="flex gap-2">
-                  <Input
-                    type="color"
+                <div className="mt-1">
+                  <ColorInput
                     value={styles[element].color}
-                    onChange={(e) =>
-                      updateTypography(element, "color", e.target.value)
+                    onChange={(value) =>
+                      updateTypography(element, "color", value)
                     }
-                    className="h-8 w-16 p-1"
-                  />
-                  <Input
-                    type="text"
-                    value={styles[element].color}
-                    onChange={(e) =>
-                      updateTypography(element, "color", e.target.value)
-                    }
-                    className="h-8 flex-1 text-xs"
-                    placeholder="#000000"
+                    placeholder="#000000, rgba(0,0,0,0.8), hsl(0,0%,10%)"
                   />
                 </div>
               </div>

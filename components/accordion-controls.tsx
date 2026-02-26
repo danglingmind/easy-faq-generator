@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { ColorInput } from "@/components/ui/color-input";
 import { FAQStyles } from "@/lib/types";
 
 interface AccordionControlsProps {
@@ -132,24 +133,12 @@ export function AccordionControls({
 
           <div>
             <Label className="text-xs">Border Color</Label>
-            <div className="mt-1 flex gap-2">
-              <Input
-                type="color"
+            <div className="mt-1">
+              <ColorInput
                 value={accordion.borderColor}
-                onChange={(e) =>
-                  updateAccordion({ borderColor: e.target.value })
-                }
+                onChange={(value) => updateAccordion({ borderColor: value })}
                 disabled={!accordion.borderVisible}
-                className="h-8 w-16 p-1"
-              />
-              <Input
-                type="text"
-                value={accordion.borderColor}
-                onChange={(e) =>
-                  updateAccordion({ borderColor: e.target.value })
-                }
-                disabled={!accordion.borderVisible}
-                className="h-8 flex-1 text-xs"
+                placeholder="#e5e5e5, rgba(0,0,0,0.15)"
               />
             </div>
           </div>

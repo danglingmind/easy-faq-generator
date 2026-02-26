@@ -35,6 +35,7 @@ export interface EditorState {
   };
   selectedTemplate?: string;
   styles?: any;
+  currentEmbedId?: string | null;
 }
 
 export function saveEditorState(state: EditorState): void {

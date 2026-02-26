@@ -59,7 +59,7 @@ export function EditorPage() {
   const [embedCopied, setEmbedCopied] = useState(false);
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const [isPaid, setIsPaid] = useState(false);
-  const [currentEmbedId, setCurrentEmbedId] = useState<string | null>(null);
+  const [currentEmbedId, setCurrentEmbedId] = useState<string | null>(savedState?.currentEmbedId || null);
 
   const isSignedIn = !!user?.id;
 
@@ -158,8 +158,9 @@ export function EditorPage() {
       content,
       selectedTemplate,
       styles,
+      currentEmbedId,
     });
-  }, [content, selectedTemplate, styles]);
+  }, [content, selectedTemplate, styles, currentEmbedId]);
 
   const handleStylesChange = useCallback((newStyles: FAQStyles) => {
     setStyles(newStyles);
@@ -234,6 +235,7 @@ export function EditorPage() {
       content: loadedConfig.content,
       selectedTemplate: loadedConfig.template,
       styles: loadedConfig.styles,
+      currentEmbedId: embedId,
     });
     
     toast.success("Embed configuration loaded!");
